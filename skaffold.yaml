@@ -4,7 +4,7 @@ metadata:
   name: project
 build:
   artifacts:
-  - image: lca/project
+  - image: lcacollect/project
     sync:
       manual:
       - src: src/**/*.py
@@ -43,9 +43,9 @@ manifests:
         appProtocol: http
         db.ssl: "false"
         deployType: DEV
-        imageKey.registry: lca/project
-        imageKey.repository: lca/project
-        imageKey.tag: lca/project
+        imageKey.registry: lcacollect/project
+        imageKey.repository: lcacollect/project
+        imageKey.tag: lcacollect/project
       setValueTemplates:
         backend.aadGraphSecret.value: '{{ .AAD_GRAPH_SECRET }}'
         backend.emailSecret.value: '{{ .EMAIL_SECRET }}'
