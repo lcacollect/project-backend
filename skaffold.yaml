@@ -1,0 +1,69 @@
+apiVersion: skaffold/v4beta1
+kind: Config
+metadata:
+  name: project
+build:
+  artifacts:
+  - image: lca/project
+    sync:
+      manual:
+      - src: src/**/*.py
+        dest: /app/src
+        strip: src
+      hooks:
+        after:
+        - container:
+            command:
+            - bash
+            - /app/export_schema.sh
+        - host:
+            command:
+            - bash
+            - extract_schema.sh
+            os:
+            - darwin
+            - linux
+    docker:
+      dockerfile: ./Dockerfile
+      buildArgs:
+        ARTIFACTS_TOKEN_BACKEND_PACKAGES: '{{ .ARTIFACTS_TOKEN_BACKEND_PACKAGES }}'
+        BUILD_STAGE: DEV
+        BUILD_VERSION: DEV
+manifests:
+  helm:
+    flags:
+      upgrade:
+      - --install
+    releases:
+    - name: project
+      chartPath: helm
+      namespace: project
+      setValues:
+        appDomain: localhost:4000
+        appProtocol: http
+        db.ssl: "false"
+        deployType: DEV
+        imageKey.registry: lca/project
+        imageKey.repository: lca/project
+        imageKey.tag: lca/project
+      setValueTemplates:
+        backend.aadGraphSecret.value: '{{ .AAD_GRAPH_SECRET }}'
+        backend.emailSecret.value: '{{ .EMAIL_SECRET }}'
+        backend.storageAccountURL.value: '{{ .STORAGE_ACCOUNT_URL }}'
+        backend.storageBasePath: test
+        backend.storageContainer.value: '{{ .STORAGE_CONTAINER }}'
+        backend.storageSecret.value: '{{ .STORAGE_SECRET }}'
+      createNamespace: true
+deploy:
+  helm: {}
+portForward:
+- resourceType: service
+  resourceName: backend-service
+  namespace: project
+  port: 8000
+  localPort: 4000
+- resourceType: service
+  resourceName: database-service
+  namespace: project
+  port: 5432
+  localPort: 5433

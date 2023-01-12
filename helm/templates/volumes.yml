@@ -1,0 +1,34 @@
+{{- if eq .Values.deployType "DEV"}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Values.db.volume }}
+  labels:
+    name: {{ .Values.db.volume }}
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: {{ .Values.db.localVolumePath}}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.db.pvc }}
+  namespace: {{ .Values.namespace }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  volumeName: {{ .Values.db.volume }}
+  selector:
+    matchLabels:
+      name: {{ .Values.db.volume }}
+  resources:
+    requests:
+      storage: 3Gi
+{{- end }}

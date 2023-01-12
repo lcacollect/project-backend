@@ -1,0 +1,87 @@
+[
+  {
+    "name": "Raw Materials",
+    "category": "Production",
+    "phase": "A1"
+  },
+  {
+    "name": "Transport",
+    "category": "Production",
+    "phase": "A2"
+  },
+  {
+    "name": "Manufacturing",
+    "category": "Production",
+    "phase": "A3"
+  },
+  {
+    "name": "Transport",
+    "category": "Construction",
+    "phase": "A4"
+  },
+  {
+    "name": "Installation",
+    "category": "Construction",
+    "phase": "A5"
+  },
+  {
+    "name": "Use",
+    "category": "Use",
+    "phase": "B1"
+  },
+  {
+    "name": "Maintenance",
+    "category": "Use",
+    "phase": "B2"
+  },
+  {
+    "name": "Repair",
+    "category": "Use",
+    "phase": "B3"
+  },
+  {
+    "name": "Replacement",
+    "category": "Use",
+    "phase": "B4"
+  },
+  {
+    "name": "Refurbishment",
+    "category": "Use",
+    "phase": "B5"
+  },
+  {
+    "name": "Operational Energy Use",
+    "category": "Use",
+    "phase": "B6"
+  },
+  {
+    "name": "Operational Water Use",
+    "category": "Use",
+    "phase": "B7"
+  },
+  {
+    "name": "Deconstruction",
+    "category": "End of Life",
+    "phase": "C1"
+  },
+  {
+    "name": "Transport",
+    "category": "End of Life",
+    "phase": "C2"
+  },
+  {
+    "name": "Waste Processing",
+    "category": "End of Life",
+    "phase": "C3"
+  },
+  {
+    "name": "Disposal",
+    "category": "End of Life",
+    "phase": "C4"
+  },
+  {
+    "name": "Benefits and loads beyond system boundary",
+    "category": "Beyond",
+    "phase": "D"
+  }
+]

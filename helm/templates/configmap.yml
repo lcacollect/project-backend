@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.db.configmap }}
+  namespace: {{ .Values.namespace }}
+data:
+  POSTGRES_HOST: {{ .Values.db.serviceName }}
+  POSTGRES_DB: {{ .Values.db.databaseName }}
+  POSTGRES_PORT: "{{ .Values.db.port }}"
+  POSTGRES_SSL: "{{ .Values.db.ssl }}"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.backend.configmap }}
+  namespace: {{ .Values.namespace }}
+data:
+  SERVER_NAME: {{- template "serverName" }}
+  SERVER_HOST: "http://localhost"
+  AAD_OPENAPI_CLIENT_ID: {{ .Values.backend.adOpenApiClientId }}
+  AAD_APP_CLIENT_ID: {{ .Values.backend.adAppClientId }}
+  AAD_TENANT_ID: {{ .Values.backend.adTenantId }}

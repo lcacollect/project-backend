@@ -1,0 +1,2 @@
+class DuplicateProjectMember(Exception):
+    pass

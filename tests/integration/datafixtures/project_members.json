@@ -1,0 +1,29 @@
+[
+  {
+    "name": "Member 1",
+    "email": "member1@email.com",
+    "company": "Arkitema",
+    "role": "Group Leader",
+    "project_group": "Engineering",
+    "last_login": null,
+    "user_id": "someid0"
+  },
+  {
+    "name": "Member 2",
+    "email": "member2@cowi.com",
+    "company": "COWI",
+    "role": "Group Leader",
+    "project_group": "Architecture",
+    "last_login": null,
+    "user_id": "someid1"
+  },
+  {
+    "name": "Member 3",
+    "email": "member3@cowi.com",
+    "company": "COWI",
+    "role": "Assistant",
+    "project_group": "Engineering",
+    "last_login": null,
+    "user_id": "someid2"
+  }
+]

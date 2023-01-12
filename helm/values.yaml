@@ -1,0 +1,65 @@
+# Default values for backend.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+namespace: project
+
+appProtocol: https
+deployType: "PROD"
+
+secretName: project-secrets
+
+secretStore:
+  name: lcacollect
+  tenantId: ""
+  userAssignedIdentityID: ""
+
+imageKey:
+  registry: lcacollect
+  repository: project
+  tag: 1
+
+db:
+  appName: database
+  serviceName: database-service
+  databaseName: project
+  configmap: db-config
+  replicas: 1
+  dockerImageTag: 13.1-alpine
+  volume: project-database-volume
+  pvc: project-database-pvc
+  port: 5432
+  secret: postgres-secret
+  username: postgres-user
+  localVolumePath: "/mnt/minikube/project"
+  ssl: true
+
+backend:
+  appName: backend
+  serviceName: backend-service
+  configmap: backend-config
+  replicas: 1
+  servicePort: 8000
+  routerUrl: http://router-service.router:4000
+  aadGraphSecret:
+    name: aad-graph-secret
+    value: "c2VjcmV0"
+  emailSecret:
+    name: sendgrid-secret
+    value: "c2VjcmV0"
+  storageAccountURL:
+    name: documentation-storage-account-url
+    value: "c2VjcmV0"
+  storageContainer:
+    name: documentation-storage-container-name
+    value: "c2VjcmV0"
+  storageSecret:
+    name: documentation-storage-access-key
+    value: "c2VjcmV0"
+  storageBasePath: hash
+  emailNotificationFrom: no-reply@arkitema.com
+  internalEmailDomains: "arkitema,cowi,cowicloud"
+  defaultAdFQDN: cowi.onmicrosoft.com
+  adTenantId: ""
+  adOpenApiClientId: ""
+  adAppClientId: ""

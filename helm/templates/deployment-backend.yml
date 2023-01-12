@@ -1,0 +1,157 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.backend.appName }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.backend.appName }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.backend.appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.backend.appName }}
+    spec:
+      {{- if eq .Values.deployType "PROD" }}
+      volumes:
+        - name: secrets-store01-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ .Values.secretName }}
+      {{- end }}
+      containers:
+        - name: {{ .Values.backend.appName }}
+          image: "{{.Values.imageKey.registry }}/{{ .Values.imageKey.repository }}:{{ .Values.imageKey.tag }}"
+          {{- if eq .Values.deployType "PROD" }}
+          volumeMounts:
+            - name: secrets-store01-inline
+              mountPath: "/mnt/secrets"
+              readOnly: true
+          {{- end}}
+          ports:
+            - containerPort: 8000
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.db.secret }}
+                  key: username
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.db.secret }}
+                  key: password
+
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.db.configmap }}
+                  key: POSTGRES_DB
+
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.db.configmap }}
+                  key: POSTGRES_HOST
+
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.db.configmap }}
+                  key: POSTGRES_PORT
+
+            - name: POSTGRES_SSL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.db.configmap }}
+                  key: POSTGRES_SSL
+
+            - name: PROJECT_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: SERVER_NAME
+                  name: {{ .Values.backend.configmap }}
+
+            - name: SERVER_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: SERVER_NAME
+                  name: {{ .Values.backend.configmap }}
+
+            - name: SERVER_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: SERVER_HOST
+                  name: {{ .Values.backend.configmap }}
+
+            - name: AAD_OPENAPI_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.backend.configmap }}
+                  key: AAD_OPENAPI_CLIENT_ID
+
+            - name: AAD_APP_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.backend.configmap }}
+                  key: AAD_APP_CLIENT_ID
+
+            - name: AAD_TENANT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.backend.configmap }}
+                  key: AAD_TENANT_ID
+
+            - name: RUN_STAGE
+              value: {{ .Values.deployType }}
+
+            - name: AAD_GRAPH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.aadGraphSecret.name }}
+                  key: secret
+
+            - name: SENDGRID_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.emailSecret.name }}
+                  key: secret
+
+            - name: EMAIL_NOTIFICATION_FROM
+              value: {{ .Values.backend.emailNotificationFrom }}
+
+            - name: STORAGE_ACCOUNT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.storageAccountURL.name }}
+                  key: secret
+            
+            - name: STORAGE_CONTAINER_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.storageContainer.name }}
+                  key: secret
+            
+            - name: STORAGE_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.storageSecret.name }}
+                  key: secret
+
+            - name: STORAGE_BASE_PATH
+              value: {{ .Values.backend.storageBasePath }}
+
+            - name: ROUTER_URL
+              value: {{ .Values.backend.routerUrl }}
+            
+            - name: INTERNAL_EMAIL_DOMAIN_NAMES
+              value: '{{ .Values.backend.internalEmailDomains }}'
+            
+            - name: DEFAULT_AD_FQDN
+              value: {{ .Values.backend.defaultAdFQDN }}
