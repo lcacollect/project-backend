@@ -1,8 +1,6 @@
 FROM python:3.10-slim as builder
 
 ARG BUILD_STAGE
-ARG ARTIFACTS_TOKEN_BACKEND_PACKAGES
-ENV ARTIFACTS_TOKEN_BACKEND_PACKAGES $ARTIFACTS_TOKEN_BACKEND_PACKAGES
 RUN python -m pip install --upgrade pip
 RUN pip install pipenv
 

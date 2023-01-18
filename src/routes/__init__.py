@@ -1,7 +1,7 @@
 import os
 
-from lcaconfig.fastapi import get_context
-from lcaconfig.router import LCAGraphQLRouter
+from lcacollect_config.fastapi import get_context
+from lcacollect_config.router import LCAGraphQLRouter
 
 from schema import schema
 

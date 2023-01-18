@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from lcaconfig.connection import create_postgres_engine
+from lcacollect_config.connection import create_postgres_engine
 from sqlmodel.ext.asyncio.session import AsyncSession
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 

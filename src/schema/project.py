@@ -9,11 +9,11 @@ import strawberry
 from azure.core.exceptions import ResourceExistsError, ResourceNotFoundError
 from azure.storage.blob.aio import BlobClient
 from fastapi import BackgroundTasks
-from lcaconfig.context import get_session, get_token, get_user
-from lcaconfig.exceptions import AuthenticationError, DatabaseItemNotFound
-from lcaconfig.formatting import str_to_date
-from lcaconfig.graphql.input_filters import FilterOptions, filter_model_query
-from lcaconfig.validate import is_super_admin
+from lcacollect_config.context import get_session, get_token, get_user
+from lcacollect_config.exceptions import AuthenticationError, DatabaseItemNotFound
+from lcacollect_config.formatting import str_to_date
+from lcacollect_config.graphql.input_filters import FilterOptions, filter_model_query
+from lcacollect_config.validate import is_super_admin
 from sqlalchemy.orm import selectinload
 from sqlmodel import col, select
 from sqlmodel.ext.asyncio.session import AsyncSession

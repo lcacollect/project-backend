@@ -2,7 +2,7 @@ from typing import Any
 
 from aiocache import caches
 from azure.identity import ClientSecretCredential
-from lcaconfig import config
+from lcacollect_config import config
 from pydantic import validator
 
 

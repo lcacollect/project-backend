@@ -3,11 +3,6 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
-[[source]]
-url = "https://azure:${ARTIFACTS_TOKEN_BACKEND_PACKAGES}@pkgs.dev.azure.com/arkitema/lca-platform/_packaging/backend-packages/pypi/simple/"
-verify_ssl = true
-name = "azure-artifacts"
-
 [packages]
 fastapi = {extras = ["all"], version = "*"}
 uvicorn = {extras = ["standard"], version = "*"}
@@ -22,7 +17,7 @@ sendgrid = "*"
 msgraph-core = "*"
 azure-identity = "*"
 specklepy = "*"
-lcaconfig = {version = "==1.8.0", index="azure-artifacts"}
+lcacollect-config = "*"
 azure-storage-blob = "*"
 aiohttp = "*"
 aiocache = "*"

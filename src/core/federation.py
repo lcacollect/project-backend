@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, Annotated, Optional, Union
 import httpx
 import strawberry
 from aiocache import cached
-from lcaconfig.context import get_session, get_token
-from lcaconfig.exceptions import (
+from lcacollect_config.context import get_session, get_token
+from lcacollect_config.exceptions import (
     DatabaseItemNotFound,
     MicroServiceConnectionError,
     MicroServiceResponseError,

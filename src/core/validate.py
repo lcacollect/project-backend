@@ -1,6 +1,6 @@
-from lcaconfig.context import get_session, get_user
-from lcaconfig.exceptions import AuthenticationError, DatabaseItemNotFound
-from lcaconfig.validate import is_super_admin
+from lcacollect_config.context import get_session, get_user
+from lcacollect_config.exceptions import AuthenticationError, DatabaseItemNotFound
+from lcacollect_config.validate import is_super_admin
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from strawberry.types import Info

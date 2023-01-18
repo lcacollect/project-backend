@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Annotated, Optional
 import strawberry
 from aiocache import cached, caches
 from fastapi import HTTPException
-from lcaconfig.graphql.input_filters import filter_model_query
+from lcacollect_config.graphql.input_filters import filter_model_query
 from msgraph.core import GraphClient
 from requests import Response
 from sendgrid import SendGridAPIClient

@@ -1,7 +1,7 @@
 from inspect import getdoc
 
 import strawberry
-from lcaconfig.permissions import IsAuthenticated
+from lcacollect_config.permissions import IsAuthenticated
 
 import schema.account as schema_account
 import schema.group as schema_group

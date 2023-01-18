@@ -1,5 +1,5 @@
 import strawberry
-from lcaconfig.context import get_user
+from lcacollect_config.context import get_user
 from strawberry.types import Info
 
 

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from lcaconfig.formatting import string_uuid
+from lcacollect_config.formatting import string_uuid
 from sqlmodel import Field, Relationship, SQLModel
 
 

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from lcaconfig.security import azure_scheme
+from lcacollect_config.security import azure_scheme
 
 from core.config import settings
 from routes import graphql_app

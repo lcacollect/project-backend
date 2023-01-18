@@ -1,9 +1,9 @@
 from typing import Any
 
 from aiocache import cached
-from lcaconfig.context import get_user
-from lcaconfig.exceptions import AuthenticationError
-from lcaconfig.validate import is_super_admin
+from lcacollect_config.context import get_user
+from lcacollect_config.exceptions import AuthenticationError
+from lcacollect_config.validate import is_super_admin
 from sqlmodel import select
 from strawberry.permission import BasePermission
 from strawberry.types import Info

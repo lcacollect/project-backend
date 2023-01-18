@@ -1,7 +1,7 @@
 from typing import Optional
 
 import strawberry
-from lcaconfig.graphql.input_filters import BaseFilter, FilterOptions, SortOptions
+from lcacollect_config.graphql.input_filters import BaseFilter, FilterOptions, SortOptions
 
 
 @strawberry.input

@@ -2,7 +2,7 @@ import asyncio
 import json
 from pathlib import Path
 
-from lcaconfig.connection import create_postgres_engine
+from lcacollect_config.connection import create_postgres_engine
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 

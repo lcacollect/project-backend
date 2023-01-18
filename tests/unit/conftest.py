@@ -1,7 +1,7 @@
 import json
 
 import pytest
-from lcaconfig.connection import create_postgres_engine
+from lcacollect_config.connection import create_postgres_engine
 from pytest_alembic.config import Config
 from sqlmodel.ext.asyncio.session import AsyncSession
 
