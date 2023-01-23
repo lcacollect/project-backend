@@ -19,7 +19,7 @@ variables:
 
   # Helm registry
   azureSubscriptionForACR: 'LCAcollect Shared Container Reg'
-  azureResourceGroupForACR: 'molio-lcacollect-Shared-container-reg-rg'
+  containerRegistryName: lcamolio.azurecr.io
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -67,7 +67,7 @@ stages:
       parameters:
         vmImageName: $(vmImageName)
         azureSubscription: $(azureSubscriptionForACR)
-        containerRegistry: $(containerRegistry)
+        containerRegistry: $(containerRegistryName)
         chartName: $(imageRepository)
         tag: $(tag)
         workingDirectory: $(workingDirectory)/helm
