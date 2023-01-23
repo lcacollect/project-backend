@@ -13,7 +13,7 @@ resources:
 variables:
   # Container registry service connection established during pipeline creation
   imageRepository: 'project'
-  containerRegistry: 'lcamolio'
+  containerRegistry: 'LCAcollect ACR'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
 
@@ -61,6 +61,7 @@ stages:
         vmImageName: $(vmImageName)
         dockerfilePath: $(dockerfilePath)
         imageRepository: $(imageRepository)
+        containerRegistry: $(containerRegistry)
         tag: $(tag)
     - template: pipelines/helm-deploy.yaml@AzureTemplates
       parameters:
