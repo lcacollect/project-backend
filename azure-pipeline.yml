@@ -13,13 +13,13 @@ resources:
 variables:
   # Container registry service connection established during pipeline creation
   imageRepository: 'project'
-  containerRegistry: 'PLACEHOLDER'
+  containerRegistry: 'lcamolio'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
 
   # Helm registry
-  azureSubscriptionForACR: 'Azure Cloud Connection'
-  azureResourceGroupForACR: 'PLACEHOLDER'
+  azureSubscriptionForACR: 'LCAcollect Shared Container Reg'
+  azureResourceGroupForACR: 'molio-lcacollect-Shared-container-reg-rg'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
