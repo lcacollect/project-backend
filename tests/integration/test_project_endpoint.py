@@ -93,9 +93,7 @@ async def test_create_project(client: AsyncClient, projects):
 
 
 @pytest.mark.asyncio
-async def test_create_project_with_picture(client: AsyncClient, base64_encoded_image: str, mocker):
-    mocker.patch("azure.storage.blob.aio.BlobClient.upload_blob", return_value=asyncio.Future())
-
+async def test_create_project_with_picture(client: AsyncClient, blob_client_mock, base64_encoded_image: str):
     query = """
     mutation(
         $name: String!
@@ -136,7 +134,7 @@ async def test_create_project_with_picture(client: AsyncClient, base64_encoded_i
         "name": "Business Garden",
         "projectId": "COWI LT",
         "client": "Some Client's Name",
-        "imageUrl": "https://documentationbundle.blob.core.windows.net/PLACEHOLDER/"
+        "imageUrl": "PLACEHOLDER/PLACEHOLDER/"
         "test/c2/ee/cdd112b12b23477c82300c5205e641171e57493b6e52e3c1a18c84815f76",
     }
 

@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 import pytest
@@ -206,3 +207,15 @@ async def base64_encoded_image():
 async def mock_members_from_azure(users_from_azure, mocker):
     mocker.patch("schema.member.get_users_from_azure", return_value=users_from_azure)
     yield users_from_azure
+
+
+@pytest.fixture
+def blob_client_mock(mocker):
+
+    class FakeBlob:
+        async def upload_blob(self, data):
+            return asyncio.Future()
+
+    mocker.patch("azure.storage.blob.aio.BlobClient.__init__", return_value=None)
+    mocker.patch("azure.storage.blob.aio.BlobClient.__aenter__", return_value=FakeBlob())
+    mocker.patch("azure.storage.blob.aio.BlobClient.__aexit__", return_value=None)
