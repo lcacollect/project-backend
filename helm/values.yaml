@@ -12,7 +12,7 @@ secretName: project-secrets
 secretStore:
   name: lcacollect
   tenantId: ""
-  userAssignedIdentityID: ""
+  clientId: ""
 
 imageKey:
   registry: lcacollect
