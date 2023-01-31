@@ -17,8 +17,9 @@ from core.federation import (
     get_group,
     get_reporting_schema,
     get_source,
-    get_task,
+    get_task, get_member,
 )
+from models.member import ProjectMember
 from schema.group import GraphQLProjectGroup
 from schema.member import GraphQLProjectMember
 
@@ -33,7 +34,50 @@ async def test_get_user_from_azure():
 
 
 @pytest.mark.asyncio
-async def test_get_assignee(db, mock_federation_get_users, users, project_members, project_groups):
+async def test_get_member(db, mock_info, mock_federation_get_users, users, project_members):
+    async with AsyncSession(db) as session:
+        info = mock_info(context={"session": session})
+        member, user = await get_member(info, users[0]["user_id"])
+
+    assert member
+    assert isinstance(member, ProjectMember)
+    assert user
+    assert isinstance(user, dict)
+
+
+@pytest.mark.asyncio
+async def test_get_member_no_user(db, mock_info, mock_federation_get_users_none, users, project_members):
+    async with AsyncSession(db) as session:
+        info = mock_info(context={"session": session})
+        member, user = await get_member(info, users[0]["user_id"])
+
+    assert not member
+    assert not user
+
+
+@pytest.mark.asyncio
+async def test_get_member_error(db, mock_info, mock_federation_get_users_error, users, project_members):
+    async with AsyncSession(db) as session:
+        info = mock_info(context={"session": session})
+        member, user = await get_member(info, users[0]["user_id"])
+
+    assert not member
+    assert not user
+
+
+@pytest.mark.asyncio
+async def test_get_member_no_member(db, mock_info, mock_federation_get_users, users):
+    async with AsyncSession(db) as session:
+        info = mock_info(context={"session": session})
+        member, user = await get_member(info, users[0]["user_id"])
+
+    assert not member
+    assert user
+    assert isinstance(user, dict)
+
+
+@pytest.mark.asyncio
+async def test_get_assignee(db, mock_info, mock_federation_get_users, users, project_members, project_groups):
     task = GraphQLTask(
         id="taskid",
         author_id=users[0]["user_id"],
@@ -42,12 +86,8 @@ async def test_get_assignee(db, mock_federation_get_users, users, project_member
         reporting_schema_id="reportingschemaid0",
     )
 
-    @dataclass
-    class Info:
-        context: dict
-
     async with AsyncSession(db) as session:
-        info = Info(context={"session": session})
+        info = mock_info(context={"session": session})
         assignee = await get_assignee(info, task)
 
     assert assignee
@@ -120,7 +160,6 @@ async def test_get_source_author(db, mock_federation_get_users, users, project_m
 
 @pytest.mark.asyncio
 async def test_get_group(db, users, mock_federation_get_users, project_members, project_groups):
-
     task = GraphQLTask(
         id="taskid",
         author_id=users[0]["user_id"],
@@ -165,7 +204,6 @@ async def test_get_no_group(db, mock_federation_get_users, users, project_member
 
 @pytest.mark.asyncio
 async def test_get_task(httpx_mock: HTTPXMock):
-
     mock_data = {
         "data": {
             "tasks": [

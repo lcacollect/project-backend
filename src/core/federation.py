@@ -1,3 +1,4 @@
+import logging
 from typing import TYPE_CHECKING, Annotated, Optional, Union
 
 import httpx
@@ -5,7 +6,6 @@ import strawberry
 from aiocache import cached
 from lcacollect_config.context import get_session, get_token
 from lcacollect_config.exceptions import (
-    DatabaseItemNotFound,
     MicroServiceConnectionError,
     MicroServiceResponseError,
 )
@@ -16,6 +16,9 @@ from strawberry.types import Info
 import models.group as models_group
 import models.member as models_member
 from core.config import settings
+from exceptions import MSGraphException
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from schema.group import GraphQLProjectGroup
@@ -34,8 +37,19 @@ async def get_author(info: Info, root: "GraphQLTask") -> "GraphQLProjectMember":
     from schema.member import GraphQLProjectMember
 
     member, user = await get_member(info, root.author_id)
+    if not user:
+        logger.info(f"Could not find a user with id: {root.author_id}")
+        return GraphQLProjectMember(
+            id="", project_id="", leader_of=[], project_groups=[],
+            user_id=root.author_id,
+            name="User doesn't exist",
+            email="",
+            company=None,
+            last_login=None
+        )
     if not member:
-        raise DatabaseItemNotFound(f"Could not find an author with id: {root.author_id}")
+        logger.info(f"Could not find a project member with user_id: {root.author_id}")
+        return GraphQLProjectMember(id="", project_id="", leader_of=[], project_groups=[], **user)
 
     return GraphQLProjectMember(
         id=member.id,
@@ -51,8 +65,11 @@ async def get_member(info: Info, member_id: str):
     from schema.member import get_users_from_azure
 
     session = get_session(info)
-    users = await get_users_from_azure(member_id)
-    user = users[0]
+    try:
+        users = await get_users_from_azure(member_id)
+        user = users[0]
+    except (IndexError, MSGraphException):
+        return None, None
     query = (
         select(models_member.ProjectMember)
         .where(models_member.ProjectMember.user_id == member_id)
@@ -72,9 +89,19 @@ async def get_assignee(info: Info, root: "GraphQLTask") -> Union["GraphQLProject
 
     if root.assignee_id:
         member, user = await get_member(info, root.assignee_id)
-
+        if not user:
+            logger.info(f"Could not find a user with id: {root.assignee_id}")
+            return GraphQLProjectMember(
+                id="", project_id="", leader_of=[], project_groups=[],
+                user_id=root.assignee_id,
+                name="User doesn't exist",
+                email="",
+                company=None,
+                last_login=None
+            )
         if not member:
-            raise DatabaseItemNotFound(f"Could not find an assignee with id: {root.assignee_id}")
+            logger.info(f"Could not find a project member with user_id: {root.assignee_id}")
+            return GraphQLProjectMember(id="", project_id="", leader_of=[], project_groups=[], **user)
 
         return GraphQLProjectMember(
             id=member.id,
@@ -110,7 +137,9 @@ async def get_group(info: Info, root: "GraphQLTask"):
     group = (await session.exec(query)).first()
 
     if not group:
-        raise DatabaseItemNotFound(f"Could not find a group with id: {root.assigned_group_id}")
+        logger.info(f"Could not find a group with id: {root.assigned_group_id}")
+        return GraphQLProjectGroup(id=root.assigned_group_id, lead=None, members=None, name="Group doesn't exist",
+                                   lead_id=None, project_id=None)
 
     return GraphQLProjectGroup(
         id=group.id,
@@ -144,7 +173,7 @@ async def get_task(reporting_schema_id: str, id: str, token: str) -> "GraphQLTas
     data = {}
 
     async with httpx.AsyncClient(
-        headers={"authorization": f"Bearer {token}"},
+            headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",
@@ -187,7 +216,7 @@ async def get_comment(task_id: str, id: str, token: str) -> "GraphQLComment":
     data = {}
 
     async with httpx.AsyncClient(
-        headers={"authorization": f"Bearer {token}"},
+            headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",
@@ -228,7 +257,7 @@ async def get_source(project_id: str, id: str, token: str) -> "GraphQLProjectSou
     data = {}
 
     async with httpx.AsyncClient(
-        headers={"authorization": f"Bearer {token}"},
+            headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",
@@ -305,7 +334,7 @@ async def delete_project_source(id: str, token: str):
     """
 
     async with httpx.AsyncClient(
-        headers={"authorization": f"Bearer {token}"},
+            headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",
@@ -334,7 +363,7 @@ async def delete_reporting_schema(id: str, token: str):
     """
 
     async with httpx.AsyncClient(
-        headers={"authorization": f"Bearer {token}"},
+            headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",
@@ -367,7 +396,7 @@ async def get_reporting_schema(project_id: str, token: str) -> list[dict]:
     """
 
     async with httpx.AsyncClient(
-        headers={"authorization": f"Bearer {token}"},
+            headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",
@@ -402,7 +431,7 @@ async def get_project_sources(project_id: str, token: str) -> list[dict]:
     """
 
     async with httpx.AsyncClient(
-        headers={"authorization": f"Bearer {token}"},
+            headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",

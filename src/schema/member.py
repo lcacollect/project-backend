@@ -22,6 +22,7 @@ import models.member as models_member
 import models.project as models_project
 from core.config import settings
 from core.validate import authenticate_user, project_exists
+from exceptions import MSGraphException
 from schema.inputs import ProjectMemberFilters
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -273,13 +274,13 @@ async def get_users_from_azure(user_ids: str | list[str]) -> list[dict[str, str]
             headers=headers,
         )
         if not responses.status_code == 200:
-            raise HTTPException(500, f"Failed to fetch users via Graph API: {responses.text}")
+            raise MSGraphException(f"Failed to fetch users via Graph API: {responses.text}")
 
         data: dict[str, list[dict]] = responses.json()
 
         for response in data.get("responses"):
             if not response.get("status") == 200:
-                raise HTTPException(500, f"Failed to fetch the response from responses: {response}")
+                raise MSGraphException(f"Failed to fetch the response from responses: {response}")
             body: dict[str, str] = response.get("body")
             email = body.get("mail")
             # some accounts have null emails

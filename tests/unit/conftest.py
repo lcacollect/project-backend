@@ -1,10 +1,12 @@
 import json
+from dataclasses import dataclass
 
 import pytest
 from lcacollect_config.connection import create_postgres_engine
 from pytest_alembic.config import Config
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from exceptions import MSGraphException
 from models.group import ProjectGroup
 from models.member import ProjectMember
 from models.project import Project
@@ -93,3 +95,31 @@ async def mock_federation_get_users(mocker, users):
         return_value=users,
     )
     yield users
+
+
+@pytest.fixture
+async def mock_federation_get_users_none(mocker):
+    mocker.patch(
+        "schema.member.get_users_from_azure",
+        return_value=[],
+    )
+    yield []
+
+
+@pytest.fixture
+async def mock_federation_get_users_error(mocker):
+    mocker.patch(
+        "schema.member.get_users_from_azure",
+        return_value=[],
+        side_effect=MSGraphException()
+    )
+    yield []
+
+
+@pytest.fixture
+def mock_info():
+    @dataclass
+    class MockInfo:
+        context: dict
+
+    return MockInfo
