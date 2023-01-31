@@ -211,7 +211,6 @@ async def mock_members_from_azure(users_from_azure, mocker):
 
 @pytest.fixture
 def blob_client_mock(mocker):
-
     class FakeBlob:
         async def upload_blob(self, data):
             return asyncio.Future()

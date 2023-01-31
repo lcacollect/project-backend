@@ -108,11 +108,7 @@ async def mock_federation_get_users_none(mocker):
 
 @pytest.fixture
 async def mock_federation_get_users_error(mocker):
-    mocker.patch(
-        "schema.member.get_users_from_azure",
-        return_value=[],
-        side_effect=MSGraphException()
-    )
+    mocker.patch("schema.member.get_users_from_azure", return_value=[], side_effect=MSGraphException())
     yield []
 
 

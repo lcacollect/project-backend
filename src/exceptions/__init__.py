@@ -4,4 +4,3 @@ class DuplicateProjectMember(Exception):
 
 class MSGraphException(Exception):
     pass
-

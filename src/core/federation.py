@@ -40,12 +40,15 @@ async def get_author(info: Info, root: "GraphQLTask") -> "GraphQLProjectMember":
     if not user:
         logger.info(f"Could not find a user with id: {root.author_id}")
         return GraphQLProjectMember(
-            id="", project_id="", leader_of=[], project_groups=[],
+            id="",
+            project_id="",
+            leader_of=[],
+            project_groups=[],
             user_id=root.author_id,
             name="User doesn't exist",
             email="",
             company=None,
-            last_login=None
+            last_login=None,
         )
     if not member:
         logger.info(f"Could not find a project member with user_id: {root.author_id}")
@@ -92,12 +95,15 @@ async def get_assignee(info: Info, root: "GraphQLTask") -> Union["GraphQLProject
         if not user:
             logger.info(f"Could not find a user with id: {root.assignee_id}")
             return GraphQLProjectMember(
-                id="", project_id="", leader_of=[], project_groups=[],
+                id="",
+                project_id="",
+                leader_of=[],
+                project_groups=[],
                 user_id=root.assignee_id,
                 name="User doesn't exist",
                 email="",
                 company=None,
-                last_login=None
+                last_login=None,
             )
         if not member:
             logger.info(f"Could not find a project member with user_id: {root.assignee_id}")
@@ -138,8 +144,14 @@ async def get_group(info: Info, root: "GraphQLTask"):
 
     if not group:
         logger.info(f"Could not find a group with id: {root.assigned_group_id}")
-        return GraphQLProjectGroup(id=root.assigned_group_id, lead=None, members=None, name="Group doesn't exist",
-                                   lead_id=None, project_id=None)
+        return GraphQLProjectGroup(
+            id=root.assigned_group_id,
+            lead=None,
+            members=None,
+            name="Group doesn't exist",
+            lead_id=None,
+            project_id=None,
+        )
 
     return GraphQLProjectGroup(
         id=group.id,
@@ -173,7 +185,7 @@ async def get_task(reporting_schema_id: str, id: str, token: str) -> "GraphQLTas
     data = {}
 
     async with httpx.AsyncClient(
-            headers={"authorization": f"Bearer {token}"},
+        headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",
@@ -216,7 +228,7 @@ async def get_comment(task_id: str, id: str, token: str) -> "GraphQLComment":
     data = {}
 
     async with httpx.AsyncClient(
-            headers={"authorization": f"Bearer {token}"},
+        headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",
@@ -257,7 +269,7 @@ async def get_source(project_id: str, id: str, token: str) -> "GraphQLProjectSou
     data = {}
 
     async with httpx.AsyncClient(
-            headers={"authorization": f"Bearer {token}"},
+        headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",
@@ -334,7 +346,7 @@ async def delete_project_source(id: str, token: str):
     """
 
     async with httpx.AsyncClient(
-            headers={"authorization": f"Bearer {token}"},
+        headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",
@@ -363,7 +375,7 @@ async def delete_reporting_schema(id: str, token: str):
     """
 
     async with httpx.AsyncClient(
-            headers={"authorization": f"Bearer {token}"},
+        headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",
@@ -396,7 +408,7 @@ async def get_reporting_schema(project_id: str, token: str) -> list[dict]:
     """
 
     async with httpx.AsyncClient(
-            headers={"authorization": f"Bearer {token}"},
+        headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",
@@ -431,7 +443,7 @@ async def get_project_sources(project_id: str, token: str) -> list[dict]:
     """
 
     async with httpx.AsyncClient(
-            headers={"authorization": f"Bearer {token}"},
+        headers={"authorization": f"Bearer {token}"},
     ) as client:
         response = await client.post(
             f"{settings.ROUTER_URL}/graphql",

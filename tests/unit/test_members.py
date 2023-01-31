@@ -15,9 +15,10 @@ from core.federation import (
     get_author,
     get_comment,
     get_group,
+    get_member,
     get_reporting_schema,
     get_source,
-    get_task, get_member,
+    get_task,
 )
 from models.member import ProjectMember
 from schema.group import GraphQLProjectGroup
