@@ -31,7 +31,6 @@ from core.federation import (
     delete_reporting_schema,
     get_project_sources,
     get_reporting_schema,
-    get_source,
 )
 from schema.directives import Keys
 from schema.inputs import ProjectFilters, ProjectMemberFilters
@@ -68,11 +67,7 @@ class GraphQLProject:
 
 @strawberry.input
 class ProjectMemberInput:
-    id: str | None
-    email: str
-    name: str
-    company: str
-    last_login: date | None
+    user_id: str
 
 
 @strawberry.input
@@ -178,6 +173,17 @@ async def add_project_mutation(
 
     session.add(project)
 
+    if members:
+        for index, member in enumerate(members):
+            project_member = models_member.ProjectMember(
+                user_id=member.user_id,
+                project=project,
+                project_id=project_id,
+            )
+            session.add(project_member)
+            if index == 0:
+                project.meta_fields.update({"owner": member.user_id})
+
     if stages:
         for stage in stages:
             stage_link = models_project.ProjectStage(project=project, **stage.dict(exclude_unset=True))
@@ -187,18 +193,6 @@ async def add_project_mutation(
         for group in groups:
             group_link = models_project.ProjectGroup(project=project, **group.dict(exclude_unset=True))
             session.add(group_link)
-
-    if members:
-        for member in members:
-            if "last_login" in member:
-                member["last_login"] = str_to_date(member["last_login"])
-
-            project_member = models_member.ProjectMember(
-                **member.dict(exclude_unset=True),
-                project=project,
-                project_id=project_id,
-            )
-            session.add(project_member)
 
     await session.commit()
     await session.refresh(project)

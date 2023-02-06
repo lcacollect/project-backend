@@ -1,6 +1,3 @@
-import asyncio
-
-import httpx
 import pytest
 from httpx import AsyncClient
 from pytest_httpx import HTTPXMock
@@ -8,13 +5,6 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.config import settings
-from core.federation import (
-    GraphQLProjectSource,
-    delete_project_source,
-    delete_reporting_schema,
-    get_reporting_schema,
-    get_source,
-)
 from models.project import Project
 
 
@@ -69,18 +59,19 @@ async def test_get_projects_with_filters(client: AsyncClient, project_with_membe
 
 
 @pytest.mark.asyncio
-async def test_create_project(client: AsyncClient, projects):
+async def test_create_project(client: AsyncClient):
     query = """
         mutation($projectId: String!){
             addProject(projectId: $projectId, name: "myProject") {
                 name
+                projectId
             }
         }
     """
 
     response = await client.post(
         f"{settings.API_STR}/graphql",
-        json={"query": query, "variables": {"projectId": projects[0].project_id}},
+        json={"query": query, "variables": {"projectId": "COWI ATR"}},
     )
 
     assert response.status_code == 200
@@ -89,6 +80,33 @@ async def test_create_project(client: AsyncClient, projects):
     assert not data.get("errors")
     assert data["data"]["addProject"] == {
         "name": f"myProject",
+        "projectId": "COWI ATR"
+    }
+
+
+@pytest.mark.asyncio
+async def test_create_project_with_owner(client: AsyncClient):
+    query = """
+        mutation {
+            addProject(members: [{userId: "someid0"}], name: "myProject") {
+                name
+                metaFields
+            }
+        }
+    """
+
+    response = await client.post(
+        f"{settings.API_STR}/graphql",
+        json={"query": query},
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert not data.get("errors")
+    assert data["data"]["addProject"] == {
+        "name": f"myProject",
+        "metaFields": {"owner": "someid0"}
     }
 
 

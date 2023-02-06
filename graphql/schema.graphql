@@ -180,11 +180,7 @@ input ProjectMemberFilters {
 }
 
 input ProjectMemberInput {
-  id: String
-  email: String!
-  name: String!
-  company: String!
-  lastLogin: Date
+  userId: String!
 }
 
 input ProjectStageInput {
