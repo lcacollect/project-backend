@@ -45,7 +45,7 @@ stages:
 
 - stage: Artifact
   displayName: Publish GraphQL Schema
-  condition: and(succeeded(), and(eq(variables.isMain, 'true'), eq(variables.isPR, 'false')))
+  condition: and(succeeded(), eq(variables.isPR, 'false'))
   dependsOn: Test
   jobs:
     - job: PublishSchema
@@ -56,7 +56,7 @@ stages:
 
 - stage: Deploy
   displayName: Build and Deploy
-  condition: and(succeeded(), and(eq(variables.isMain, 'true'), eq(variables.isPR, 'false')))
+  condition: and(succeeded(), eq(variables.isPR, 'false'))
   dependsOn: 
     - Test
     - Artifact
