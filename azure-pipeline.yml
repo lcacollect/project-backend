@@ -24,7 +24,7 @@ variables:
 
   # Helm registry
   azureSubscriptionForACR: 'LCAcollect Shared Container Reg'
-  containerRegistryName: lcamolio.azurecr.io
+  containerRegistryName: lcacollect.azurecr.io
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
