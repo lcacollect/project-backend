@@ -26,7 +26,7 @@ async def projects(db) -> list[Project]:
             project = Project(
                 name=f"Project {i}",
                 project_id="some_id",
-                meta_fields={},
+                meta_fields={"domain": "design"},
                 groups=[],
                 members=[ProjectMember(user_id="someid0")],
                 stages=[],

@@ -1,6 +1,6 @@
 directive @keys(fields: String!) on OBJECT
 
-schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable"]) {
+schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key", "@shareable"]) {
   query: Query
   mutation: Mutation
 }
@@ -16,6 +16,7 @@ input FilterOptions {
   isEmpty: Boolean = null
   isNotEmpty: Boolean = null
   isAnyOf: [String!] = null
+  jsonContains: String = null
 }
 
 type GraphQLComment @key(fields: "id") {
@@ -157,6 +158,7 @@ input ProjectFilters {
   name: FilterOptions = null
   projectId: FilterOptions = null
   id: FilterOptions = null
+  metaFields: FilterOptions = null
 }
 
 input ProjectGroupFilters {

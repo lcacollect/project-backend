@@ -1,11 +1,7 @@
 from typing import Optional
 
 import strawberry
-from lcacollect_config.graphql.input_filters import (
-    BaseFilter,
-    FilterOptions,
-    SortOptions,
-)
+from lcacollect_config.graphql.input_filters import BaseFilter, FilterOptions
 
 
 @strawberry.input
@@ -22,6 +18,7 @@ class ProjectFilters(BaseFilter):
     name: Optional[FilterOptions] = None
     project_id: Optional[FilterOptions] = None
     id: Optional[FilterOptions] = None
+    meta_fields: Optional[FilterOptions] = None
 
 
 @strawberry.input
