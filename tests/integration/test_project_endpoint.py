@@ -68,7 +68,7 @@ async def test_get_projects_with_json_filters(client: AsyncClient, project_with_
 
     response = await client.post(
         f"{settings.API_STR}/graphql",
-        json={"query": query, "variables": {"json_value": "{'meta_fields': '{domain: design}'}"}},
+        json={"query": query, "variables": {"json_value": "{meta_fields: {domain: design}}"}},
     )
 
     assert response.status_code == 200

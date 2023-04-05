@@ -9,7 +9,6 @@ from models.group import ProjectGroup
 
 @pytest.mark.asyncio
 async def test_get_project_groups(client: AsyncClient, project_with_groups, mock_members_from_azure):
-
     query = """
     query($projectId: String!) {
         projectGroups(projectId: $projectId) {
@@ -51,7 +50,6 @@ async def test_get_project_groups(client: AsyncClient, project_with_groups, mock
 
 @pytest.mark.asyncio
 async def test_get_project_groups_filters(client: AsyncClient, project_with_groups, mock_members_from_azure):
-
     query = """
     query($projectId: String!, $name: String!) {
         projectGroups(projectId: $projectId, filters: {name: {equal: $name}}) {
@@ -161,7 +159,6 @@ async def test_update_project_group_mutation(client: AsyncClient, project_groups
 
 @pytest.mark.asyncio
 async def test_delete_project_group_mutation(client: AsyncClient, db, project_groups):
-
     query = f"""
         mutation {{
             deleteProjectGroup(id: "{project_groups[0].id}")

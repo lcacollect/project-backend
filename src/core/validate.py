@@ -10,7 +10,6 @@ from models.project import Project
 
 
 async def project_exists(session: AsyncSession, project_id: str) -> bool:
-
     """Check that a project exists in the database"""
 
     if not await session.get(Project, project_id):
@@ -19,7 +18,6 @@ async def project_exists(session: AsyncSession, project_id: str) -> bool:
 
 
 async def authenticate_user(info: Info, project_id: str) -> AsyncSession:
-
     """Check that user has access to project data"""
 
     session = get_session(info)

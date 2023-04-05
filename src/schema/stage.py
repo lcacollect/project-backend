@@ -37,7 +37,6 @@ class GraphQLProjectStage:
 
 
 async def get_life_cycle_stages_query(info: Info) -> list[GraphQLLifeCycleStage]:
-
     """Get all life cycle stages"""
 
     session = info.context.get("session")
@@ -48,7 +47,6 @@ async def get_life_cycle_stages_query(info: Info) -> list[GraphQLLifeCycleStage]
 
 
 async def get_project_stages_query(info: Info, project_id: str) -> list[GraphQLProjectStage]:
-
     """Get all life cycle stage associated with a project"""
 
     session = get_session(info)
@@ -65,7 +63,6 @@ async def get_project_stages_query(info: Info, project_id: str) -> list[GraphQLP
 
 
 async def add_project_stage_mutation(info: Info, project_id: str, stage_id: str) -> GraphQLProjectStage:
-
     """Add a life cycle stage to a project"""
 
     session = info.context.get("session")
@@ -92,7 +89,6 @@ async def add_project_stage_mutation(info: Info, project_id: str, stage_id: str)
 
 
 async def delete_project_stage_mutation(info: Info, project_id: str, stage_id: str) -> str:
-
     """Remove a life cycle stage from a project"""
 
     session = info.context.get("session")

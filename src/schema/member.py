@@ -46,7 +46,6 @@ class GraphQLProjectMember:
 async def project_members_query(
     info: Info, project_id: str, filters: Optional[ProjectMemberFilters] = None
 ) -> list[GraphQLProjectMember]:
-
     """
     Query Project Members using ProjectID.
     Filters can be used to query unique members of the Project
@@ -89,7 +88,6 @@ async def project_members_query(
 
 
 def get_user_info(users, user_id: str) -> dict:
-
     """
     Extract user information from Azure Active Directory
     """
@@ -103,7 +101,6 @@ def get_user_info(users, user_id: str) -> dict:
 async def add_project_member_mutation(
     info: Info, name: str, email: str, project_id: str, project_group_ids: list[str]
 ) -> GraphQLProjectMember:
-
     """Add a Project Member"""
 
     session: AsyncSession = info.context.get("session")
@@ -167,7 +164,6 @@ async def add_project_member_mutation(
 
 
 async def delete_project_member_mutation(info: Info, id: str) -> str:
-
     """Delete a Project Member"""
 
     session = info.context.get("session")
