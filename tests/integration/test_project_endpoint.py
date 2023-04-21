@@ -127,6 +127,62 @@ async def test_create_project_with_owner(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_create_project_with_stages(client: AsyncClient, life_cycle_stages):
+    stage_query = """
+        query {
+            lifeCycleStages {
+                name
+                id
+                category
+                phase
+            }
+        }
+    """
+
+    response = await client.post(f"{settings.API_STR}/graphql", json={"query": stage_query, "variables": None})
+
+    assert response.status_code == 200
+
+    response_obj = response.json()
+
+    assert len(response_obj["data"]["lifeCycleStages"]) == 17
+
+    stage_id = response_obj["data"]["lifeCycleStages"][0].get("id")
+    stage_id2 = response_obj["data"]["lifeCycleStages"][1].get("id")
+
+    query = """
+        mutation(
+            $name: String!
+            $stages: [LifeCycleStageInput!]
+        ){
+            addProject(stages: $stages, name: $name) {
+                name
+                stages {
+                    stageId
+                }
+            }
+        }
+    """
+
+    response = await client.post(
+        f"{settings.API_STR}/graphql",
+        json={
+            "query": query,
+            "variables": {"name": "myProject", "stages": [{"stageId": stage_id}, {"stageId": stage_id2}]},
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert not data.get("errors")
+    assert data["data"]["addProject"] == {
+        "name": f"myProject",
+        "stages": [{"stageId": stage_id}, {"stageId": stage_id2}],
+    }
+
+
+@pytest.mark.asyncio
 async def test_create_project_with_picture(client: AsyncClient, blob_client_mock, base64_encoded_image: str):
     query = """
     mutation(
