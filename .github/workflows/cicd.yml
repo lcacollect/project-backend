@@ -10,10 +10,12 @@ jobs:
   test:
     uses: lcacollect/.github/.github/workflows/test-python.yaml@main
   publish-schema:
+    needs: test
     if: github.event_name != 'pull_request'
     uses: lcacollect/.github/.github/workflows/publish-graphql.yaml@main
   build-container:
     uses: lcacollect/.github/.github/workflows/build-image.yaml@main
+    needs: test
     with:
       tag: ${{ github.run_number }}
       registry: "lcacollect"
