@@ -360,6 +360,7 @@ async def authenticate_user(id, info):
 
     session = info.context.get("session")
     user = info.context.get("user")
+
     projects_query = (
         select(models_project.Project)
         .join(models_member.ProjectMember)
@@ -369,6 +370,7 @@ async def authenticate_user(id, info):
         )
     )
     authenticated_project = await session.exec(projects_query)
+
     if not authenticated_project:
         raise AuthenticationError
     return session
