@@ -21,3 +21,12 @@ jobs:
       tag: ${{ github.run_number }}
       registry: "lcacollect"
       name: "project"
+  publish-chart:
+    uses: lcacollect/.github/.github/workflows/publish-chart.yaml@main
+    needs: 
+      - test
+      - build-container
+    with:
+      tag: ${{ github.run_number }}
+      registry: "lcacollect"
+      name: "project"
