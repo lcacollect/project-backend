@@ -23,6 +23,7 @@ jobs:
       name: "project"
   publish-chart:
     uses: lcacollect/.github/.github/workflows/publish-chart.yaml@main
+    if: github.event_name != 'pull_request'
     needs: 
       - test
       - build-container
