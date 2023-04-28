@@ -1,0 +1,20 @@
+name: Container CI/CD Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    uses: lcacollect/.github/.github/workflows/test-python.yaml@main
+  publish-schema:
+    if: github.event_name != 'pull_request'
+    uses: lcacollect/.github/.github/workflows/publish-graphql.yaml@main
+  build-container:
+    uses: lcacollect/.github/.github/workflows/build-image.yaml@main
+    with:
+      tag: ${{ github.run_number }}
+      registry: "lcacollect"
+      name: "project"
