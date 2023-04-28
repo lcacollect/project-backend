@@ -78,11 +78,8 @@ class ProjectGroupInput:
 
 
 @strawberry.input
-class ProjectStageInput:
-    id: str
-    name: str
-    stage: str
-    lifecycle_phase: str
+class LifeCycleStageInput:
+    stage_id: str
 
 
 async def projects_query(info: Info, filters: Optional[ProjectFilters] = None) -> list[GraphQLProject]:
@@ -151,7 +148,7 @@ async def add_project_mutation(
     file: Optional[str] = None,
     members: Optional[list[ProjectMemberInput]] = None,
     groups: Optional[list[ProjectGroupInput]] = None,
-    stages: Optional[list[ProjectStageInput]] = None,
+    stages: Optional[list[LifeCycleStageInput]] = None,
     meta_fields: Optional[JSON] = None,
 ) -> GraphQLProject:
     """Add a Project"""
@@ -186,7 +183,7 @@ async def add_project_mutation(
 
     if stages:
         for stage in stages:
-            stage_link = models_project.ProjectStage(project=project, **stage.dict(exclude_unset=True))
+            stage_link = models_project.ProjectStage(project=project, stage_id=stage.stage_id)
             session.add(stage_link)
 
     if groups:
@@ -363,6 +360,7 @@ async def authenticate_user(id, info):
 
     session = info.context.get("session")
     user = info.context.get("user")
+
     projects_query = (
         select(models_project.Project)
         .join(models_member.ProjectMember)
@@ -372,6 +370,7 @@ async def authenticate_user(id, info):
         )
     )
     authenticated_project = await session.exec(projects_query)
+
     if not authenticated_project:
         raise AuthenticationError
     return session
