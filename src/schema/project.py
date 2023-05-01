@@ -1,6 +1,5 @@
 import base64
 import logging
-from datetime import date
 from enum import Enum
 from hashlib import sha256
 from typing import Optional
@@ -11,7 +10,6 @@ from azure.storage.blob.aio import BlobClient
 from fastapi import BackgroundTasks
 from lcacollect_config.context import get_session, get_token, get_user
 from lcacollect_config.exceptions import AuthenticationError, DatabaseItemNotFound
-from lcacollect_config.formatting import str_to_date
 from lcacollect_config.graphql.input_filters import FilterOptions, filter_model_query
 from lcacollect_config.validate import is_super_admin
 from sqlalchemy.orm import selectinload
