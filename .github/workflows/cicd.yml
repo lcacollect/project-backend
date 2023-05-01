@@ -18,6 +18,9 @@ jobs:
     if: github.event_name != 'pull_request'
     uses: lcacollect/.github/.github/workflows/publish-graphql.yaml@main
     needs: test
+    with:
+      name: 'project'
+      branch: ${{ github.ref_name }}
   build-container:
     uses: lcacollect/.github/.github/workflows/build-image.yaml@main
     needs: test
