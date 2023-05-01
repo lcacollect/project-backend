@@ -11,10 +11,6 @@ on:
       - stage
   workflow_dispatch:
 
-env:
-  NAME: "project"
-  TAG: ${{ github.run_number }}${{ github.ref-name != 'main' && '-dev' || ''}}
-
 jobs:
   test:
     uses: lcacollect/.github/.github/workflows/test-python.yaml@main
@@ -26,9 +22,9 @@ jobs:
     uses: lcacollect/.github/.github/workflows/build-image.yaml@main
     needs: test
     with:
-      tag: ${{ env.TAG }}
+      tag: "${{ github.run_number }}${{ (github.ref_name != 'main' && '-dev') || ''}}"
       registry: "lcacollect"
-      name: ${{ env.NAME }}
+      name: 'project'
   publish-chart:
     if: github.event_name != 'pull_request'
     uses: lcacollect/.github/.github/workflows/publish-chart.yaml@main
@@ -36,6 +32,6 @@ jobs:
       - test
       - build-container
     with:
-      tag: ${{ env.TAG }}
+      tag: "${{ github.run_number }}${{ (github.ref_name != 'main' && '-dev') || ''}}"
       registry: "lcacollect"
-      name: ${{ env.NAME }}
+      name: 'project'
