@@ -21,6 +21,10 @@ jobs:
     with:
       name: 'project'
       branch: ${{ github.ref_name }}
+      storage-account: ${{ vars.PRODUCTION_STORAGE_ACCOUNT }}
+      container-name: ${{ vars.GRAPHQL_CONTAINER_NAME }}
+    secrets:
+      azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
   build-container:
     uses: lcacollect/.github/.github/workflows/build-image.yaml@main
     needs: test
