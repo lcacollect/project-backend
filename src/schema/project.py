@@ -143,6 +143,9 @@ async def add_project_mutation(
     project_id: Optional[str] = None,
     client: Optional[str] = None,
     domain: Optional[ProjectDomain] = None,
+    address: Optional[str] = None,
+    city: Optional[str] = None,
+    country: Optional[str] = None,
     file: Optional[str] = None,
     members: Optional[list[ProjectMemberInput]] = None,
     groups: Optional[list[ProjectGroupInput]] = None,
@@ -161,6 +164,9 @@ async def add_project_mutation(
         project_id=project_id,
         client=client,
         domain=domain,
+        city=city,
+        country=country,
+        address=address,
         meta_fields=meta_fields,
     )
     if file:
