@@ -24,7 +24,7 @@ jobs:
       storage_account: ${{ vars.PRODUCTION_STORAGE_ACCOUNT }}
       container_name: ${{ vars.GRAPHQL_CONTAINER_NAME }}
     secrets:
-      azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
+      azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
   build-container:
     uses: lcacollect/.github/.github/workflows/build-image.yaml@main
     needs: test
