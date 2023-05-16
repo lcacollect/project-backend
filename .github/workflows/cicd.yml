@@ -42,3 +42,14 @@ jobs:
       tag: "${{ github.run_number }}${{ (github.ref_name != 'main' && '-dev') || ''}}"
       registry: "lcacollect"
       name: 'project'
+  webhook:
+    if: github.event_name != 'pull_request'
+    needs:
+      - publish-schema
+      - publish-chart
+    uses: lcacollect/.github/.github/workflows/send-dispatch.yaml@main
+    with:
+      repo_name: 'project'
+      receiver_repo: 'lcacollect/router-backend'
+    secrets:
+      dispatch_token: ${{ secrets.DISPATCH_TOKEN }}
