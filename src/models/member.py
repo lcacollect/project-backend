@@ -1,6 +1,7 @@
+from typing import Optional
+
 from lcacollect_config.formatting import string_uuid
 from sqlmodel import Field, Relationship, SQLModel
-from typing import Optional
 
 from models.group import MemberGroupLink, ProjectGroup
 
