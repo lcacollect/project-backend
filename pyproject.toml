@@ -3,7 +3,7 @@
 asyncio_mode = "auto"
 console_output_style = "count"
 pythonpath = "src"
-required_plugins = ["pytest-cov>=4.0.0", "pytest-azurepipelines"]
+required_plugins = ["pytest-cov>=4.0.0"]
 testpaths = ["tests/"]
 
 env = [
