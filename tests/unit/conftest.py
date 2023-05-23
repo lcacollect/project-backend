@@ -91,7 +91,7 @@ async def project_groups(db, users_with_groups, project) -> list[ProjectGroup]:
 @pytest.fixture
 async def mock_federation_get_users(mocker, users):
     mocker.patch(
-        "schema.member.get_users_from_azure",
+        "lcacollect_config.user.get_users_from_azure",
         return_value=users,
     )
     yield users
@@ -100,7 +100,7 @@ async def mock_federation_get_users(mocker, users):
 @pytest.fixture
 async def mock_federation_get_users_none(mocker):
     mocker.patch(
-        "schema.member.get_users_from_azure",
+        "lcacollect_config.user.get_users_from_azure",
         return_value=[],
     )
     yield []
@@ -108,7 +108,7 @@ async def mock_federation_get_users_none(mocker):
 
 @pytest.fixture
 async def mock_federation_get_users_error(mocker):
-    mocker.patch("schema.member.get_users_from_azure", return_value=[], side_effect=MSGraphException())
+    mocker.patch("lcacollect_config.user.get_users_from_azure", return_value=[], side_effect=MSGraphException())
     yield []
 
 

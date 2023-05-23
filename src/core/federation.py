@@ -65,7 +65,7 @@ async def get_author(info: Info, root: "GraphQLTask") -> "GraphQLProjectMember":
 
 async def get_member(info: Info, member_id: str):
     """Queries a single Project Member from Azure"""
-    from schema.member import get_users_from_azure
+    from lcacollect_config.user import get_users_from_azure
 
     session = get_session(info)
     try:

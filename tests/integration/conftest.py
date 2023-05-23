@@ -6,7 +6,6 @@ from sqlalchemy.orm import selectinload
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from core.config import settings
 from models.group import ProjectGroup
 from models.member import ProjectMember
 from models.project import Project

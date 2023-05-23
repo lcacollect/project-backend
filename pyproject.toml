@@ -27,7 +27,7 @@ env = [
     "STORAGE_ACCESS_KEY=PLACEHOLDER",
     "STORAGE_BASE_PATH=test",
     "EMAIL_NOTIFICATION_FROM=no-reply@arkitema.com",
-    "INTERNAL_EMAIL_DOMAIN_NAMES=arkitema,cowi,cowicloud",
+    "INTERNAL_EMAIL_DOMAINS_LIST=arkitema,cowi,cowicloud",
     "DEFAULT_AD_FQDN=cowi.onmicrosoft.com"
 
 ]

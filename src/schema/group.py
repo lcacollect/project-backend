@@ -215,7 +215,9 @@ def graphql_group_options(info: Info, query: Select) -> Select:
 async def handle_members_and_lead(info: Info, group: models_group.ProjectGroup):
     """Handle fetching data about lead and project members, if it is required in the query/mutation"""
 
-    from schema.member import GraphQLProjectMember, get_user_info, get_users_from_azure
+    from lcacollect_config.user import get_users_from_azure
+
+    from schema.member import GraphQLProjectMember, get_user_info
 
     session = get_session(info)
     # if neither lead nor members were requested return group as is

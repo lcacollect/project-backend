@@ -13,15 +13,13 @@ sqlmodel = "==0.0.8"
 alembic = "*"
 tenacity = "*"
 sqlalchemy = {extras = ["asyncio"], version = "==1.4.35"}
-sendgrid = "*"
-msgraph-core = "*"
-azure-identity = "*"
 specklepy = "*"
 lcacollect-config = "*"
 azure-storage-blob = "*"
 aiohttp = "*"
 aiocache = "*"
 httpx = "==0.23.3"
+pytest-azurepipelines = "*"
 
 [dev-packages]
 pydevd-pycharm = "==222.4459.20"

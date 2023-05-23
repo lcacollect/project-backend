@@ -47,11 +47,11 @@ manifests:
           imageKey.tag: lcacollect/project
         setValueTemplates:
           backend.aadGraphSecret.value: '{{ .AAD_GRAPH_SECRET }}'
-          backend.emailSecret.value: '{{ .EMAIL_SECRET }}'
+          backend.emailSecret.value: '{{ .SENDGRID_SECRET }}'
           backend.storageAccountURL.value: '{{ .STORAGE_ACCOUNT_URL }}'
           backend.storageBasePath: test
-          backend.storageContainer.value: '{{ .STORAGE_CONTAINER }}'
-          backend.storageSecret.value: '{{ .STORAGE_SECRET }}'
+          backend.storageContainer.value: '{{ .STORAGE_CONTAINER_NAME }}'
+          backend.storageSecret.value: '{{ .STORAGE_ACCESS_KEY }}'
           backend.adTenantId: '{{ .AAD_TENANT_ID }}'
           backend.adOpenApiClientId: '{{ .AAD_OPENAPI_CLIENT_ID }}'
           backend.adAppClientId: '{{ .AAD_APP_CLIENT_ID }}'
