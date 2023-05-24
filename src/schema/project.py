@@ -1,6 +1,5 @@
 import base64
 import logging
-from datetime import date
 from enum import Enum
 from hashlib import sha256
 from typing import Optional
@@ -11,7 +10,6 @@ from azure.storage.blob.aio import BlobClient
 from fastapi import BackgroundTasks
 from lcacollect_config.context import get_session, get_token, get_user
 from lcacollect_config.exceptions import AuthenticationError, DatabaseItemNotFound
-from lcacollect_config.formatting import str_to_date
 from lcacollect_config.graphql.input_filters import FilterOptions, filter_model_query
 from lcacollect_config.validate import is_super_admin
 from sqlalchemy.orm import selectinload
@@ -78,11 +76,8 @@ class ProjectGroupInput:
 
 
 @strawberry.input
-class ProjectStageInput:
-    id: str
-    name: str
-    stage: str
-    lifecycle_phase: str
+class LifeCycleStageInput:
+    stage_id: str
 
 
 async def projects_query(info: Info, filters: Optional[ProjectFilters] = None) -> list[GraphQLProject]:
@@ -148,10 +143,13 @@ async def add_project_mutation(
     project_id: Optional[str] = None,
     client: Optional[str] = None,
     domain: Optional[ProjectDomain] = None,
+    address: Optional[str] = None,
+    city: Optional[str] = None,
+    country: Optional[str] = None,
     file: Optional[str] = None,
     members: Optional[list[ProjectMemberInput]] = None,
     groups: Optional[list[ProjectGroupInput]] = None,
-    stages: Optional[list[ProjectStageInput]] = None,
+    stages: Optional[list[LifeCycleStageInput]] = None,
     meta_fields: Optional[JSON] = None,
 ) -> GraphQLProject:
     """Add a Project"""
@@ -166,6 +164,9 @@ async def add_project_mutation(
         project_id=project_id,
         client=client,
         domain=domain,
+        city=city,
+        country=country,
+        address=address,
         meta_fields=meta_fields,
     )
     if file:
@@ -186,7 +187,7 @@ async def add_project_mutation(
 
     if stages:
         for stage in stages:
-            stage_link = models_project.ProjectStage(project=project, **stage.dict(exclude_unset=True))
+            stage_link = models_project.ProjectStage(project=project, stage_id=stage.stage_id)
             session.add(stage_link)
 
     if groups:
@@ -363,6 +364,7 @@ async def authenticate_user(id, info):
 
     session = info.context.get("session")
     user = info.context.get("user")
+
     projects_query = (
         select(models_project.Project)
         .join(models_member.ProjectMember)
@@ -372,6 +374,7 @@ async def authenticate_user(id, info):
         )
     )
     authenticated_project = await session.exec(projects_query)
+
     if not authenticated_project:
         raise AuthenticationError
     return session

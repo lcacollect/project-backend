@@ -6,7 +6,6 @@ from sqlalchemy.orm import selectinload
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from core.config import settings
 from models.group import ProjectGroup
 from models.member import ProjectMember
 from models.project import Project
@@ -26,7 +25,7 @@ async def projects(db) -> list[Project]:
             project = Project(
                 name=f"Project {i}",
                 project_id="some_id",
-                meta_fields={},
+                meta_fields={"domain": "design"},
                 groups=[],
                 members=[ProjectMember(user_id="someid0")],
                 stages=[],

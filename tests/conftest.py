@@ -75,7 +75,6 @@ def mock_azure_scheme(mocker):
 
 @pytest.fixture()
 async def app(db, mock_azure_scheme) -> FastAPI:
-
     from main import app
 
     async with LifespanManager(app):

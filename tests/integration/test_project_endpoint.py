@@ -10,7 +10,6 @@ from models.project import Project
 
 @pytest.mark.asyncio
 async def test_get_projects(client: AsyncClient, project_with_members):
-
     query = """
         query {
             projects {
@@ -35,7 +34,6 @@ async def test_get_projects(client: AsyncClient, project_with_members):
 
 @pytest.mark.asyncio
 async def test_get_projects_with_filters(client: AsyncClient, project_with_members):
-
     query = """
         query($name: String!) {
             projects(filters: {name: {equal: $name}}) {
@@ -59,6 +57,30 @@ async def test_get_projects_with_filters(client: AsyncClient, project_with_membe
 
 
 @pytest.mark.asyncio
+async def test_get_projects_with_json_filters(client: AsyncClient, project_with_members):
+    query = """
+        query($json_value: String!) {
+            projects(filters: {metaFields: {jsonContains: $json_value}}) {
+                metaFields
+            }
+        }
+    """
+
+    response = await client.post(
+        f"{settings.API_STR}/graphql",
+        json={"query": query, "variables": {"json_value": "{meta_fields: {domain: design}}"}},
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    print(data)
+
+    assert not data.get("errors")
+    assert len(data["data"]["projects"]) == 4
+    assert data["data"]["projects"][0] == {"metaFields": {"domain": "design"}}
+
+
+@pytest.mark.asyncio
 async def test_create_project(client: AsyncClient):
     query = """
         mutation($projectId: String!){
@@ -78,10 +100,7 @@ async def test_create_project(client: AsyncClient):
     data = response.json()
 
     assert not data.get("errors")
-    assert data["data"]["addProject"] == {
-        "name": f"myProject",
-        "projectId": "COWI ATR"
-    }
+    assert data["data"]["addProject"] == {"name": f"myProject", "projectId": "COWI ATR"}
 
 
 @pytest.mark.asyncio
@@ -104,9 +123,62 @@ async def test_create_project_with_owner(client: AsyncClient):
     data = response.json()
 
     assert not data.get("errors")
+    assert data["data"]["addProject"] == {"name": f"myProject", "metaFields": {"owner": "someid0"}}
+
+
+@pytest.mark.asyncio
+async def test_create_project_with_stages(client: AsyncClient, life_cycle_stages):
+    stage_query = """
+        query {
+            lifeCycleStages {
+                name
+                id
+                category
+                phase
+            }
+        }
+    """
+
+    response = await client.post(f"{settings.API_STR}/graphql", json={"query": stage_query, "variables": None})
+
+    assert response.status_code == 200
+
+    response_obj = response.json()
+
+    assert len(response_obj["data"]["lifeCycleStages"]) == 17
+
+    stage_id = response_obj["data"]["lifeCycleStages"][0].get("id")
+    stage_id2 = response_obj["data"]["lifeCycleStages"][1].get("id")
+
+    query = """
+        mutation(
+            $name: String!
+            $stages: [LifeCycleStageInput!]
+        ){
+            addProject(stages: $stages, name: $name) {
+                name
+                stages {
+                    stageId
+                }
+            }
+        }
+    """
+
+    response = await client.post(
+        f"{settings.API_STR}/graphql",
+        json={
+            "query": query,
+            "variables": {"name": "myProject", "stages": [{"stageId": stage_id}, {"stageId": stage_id2}]},
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert not data.get("errors")
     assert data["data"]["addProject"] == {
         "name": f"myProject",
-        "metaFields": {"owner": "someid0"}
+        "stages": [{"stageId": stage_id}, {"stageId": stage_id2}],
     }
 
 
@@ -159,7 +231,6 @@ async def test_create_project_with_picture(client: AsyncClient, blob_client_mock
 
 @pytest.mark.asyncio
 async def test_update_project(client: AsyncClient, mock_members_from_azure, project_with_members):
-
     query = """
         mutation(
             $name: String, $id: String!, $client: String! $address: String! $city: String! $country: String! 
@@ -207,7 +278,6 @@ async def test_update_project(client: AsyncClient, mock_members_from_azure, proj
 
 @pytest.mark.asyncio
 async def test_delete_project(client: AsyncClient, projects, db, httpx_mock: HTTPXMock, mocker):
-
     reporting_schemas_mock = {
         "data": {
             "reportingSchemas": [

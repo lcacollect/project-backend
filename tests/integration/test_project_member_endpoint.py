@@ -168,7 +168,6 @@ async def test_add_project_member(client: AsyncClient, project_groups, mocker):
 
 @pytest.mark.asyncio
 async def test_delete_project_member(client: AsyncClient, project_members, db):
-
     query = """
         mutation($id: String!) {
             deleteProjectMember(id: $id)
@@ -198,7 +197,6 @@ async def test_delete_project_member(client: AsyncClient, project_members, db):
 async def test_add_project_members_to_group(
     client: AsyncClient, group_with_members, project_members, mock_members_from_azure
 ):
-
     member_ids = [member.id for member in project_members][2]
 
     query = """
@@ -241,7 +239,6 @@ async def test_add_project_members_to_group(
 async def test_remove_project_members_from_group(
     client: AsyncClient, group_with_members, project_members, mock_members_from_azure
 ):
-
     member_ids_to_remove = [member.id for member in project_members][2]
 
     assert member_ids_to_remove

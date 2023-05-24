@@ -13,17 +13,16 @@ sqlmodel = "==0.0.8"
 alembic = "*"
 tenacity = "*"
 sqlalchemy = {extras = ["asyncio"], version = "==1.4.35"}
-sendgrid = "*"
-msgraph-core = "*"
-azure-identity = "*"
 specklepy = "*"
 lcacollect-config = "*"
 azure-storage-blob = "*"
 aiohttp = "*"
 aiocache = "*"
+httpx = "==0.23.3"
 
 [dev-packages]
 pydevd-pycharm = "==222.4459.20"
+debugpy = "*"
 pytest = "*"
 pytest-asyncio = "*"
 pytest-env = "*"
@@ -41,7 +40,6 @@ pytest-httpx = "*"
 testcontainers = "*"
 psutil = "==5.9.3"
 pytest-cov = "*"
-pytest-azurepipelines = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3.11"
