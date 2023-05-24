@@ -19,7 +19,6 @@ azure-storage-blob = "*"
 aiohttp = "*"
 aiocache = "*"
 httpx = "==0.23.3"
-pytest-azurepipelines = "*"
 
 [dev-packages]
 pydevd-pycharm = "==222.4459.20"
