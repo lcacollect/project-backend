@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 fastapi = {extras = ["all"], version = "*"}
 uvicorn = {extras = ["standard"], version = "*"}
-strawberry-graphql = {extras = ["fastapi"], version = ">=0.146.0"}
+strawberry-graphql = {extras = ["fastapi", "cli"], version = ">=0.192.0"}
 fastapi-azure-auth = "*"
 asyncpg = "*"
 sqlmodel = "==0.0.8"
@@ -14,7 +14,7 @@ alembic = "*"
 tenacity = "*"
 sqlalchemy = {extras = ["asyncio"], version = "==1.4.35"}
 specklepy = "*"
-lcacollect-config = "*"
+lcacollect-config = ">=1.6.1"
 azure-storage-blob = "*"
 aiohttp = "*"
 aiocache = "*"
