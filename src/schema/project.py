@@ -99,7 +99,7 @@ async def projects_query(info: Info, filters: Optional[ProjectFilters] = None) -
             .where(models_member.ProjectMember.user_id == user.claims.get("oid"))
             .join(models_member.ProjectMember)
             .options(selectinload(models_project.Project.groups))
-            .options(selectinload(models_project.Project.stages))
+            .options(selectinload(models_project.Project.stages).options(selectinload(models_project.ProjectStage.stage)))
             .options(selectinload(models_project.Project.members))
         )
 
