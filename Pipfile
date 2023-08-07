@@ -21,7 +21,7 @@ aiocache = "*"
 httpx = "==0.23.3"
 
 [dev-packages]
-pydevd-pycharm = "==222.4459.20"
+pydevd-pycharm = "~=232.8660.197"
 debugpy = "*"
 pytest = "*"
 pytest-asyncio = "*"

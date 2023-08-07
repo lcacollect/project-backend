@@ -15,11 +15,13 @@ from lcacollect_config.validate import is_super_admin
 from sqlalchemy.orm import selectinload
 from sqlmodel import col, select
 from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlmodel.sql.expression import SelectOfScalar
 from strawberry.scalars import JSON
 from strawberry.types import Info
 
 import models.member as models_member
 import models.project as models_project
+import models.stage as models_stage
 import schema.group as schema_group
 import schema.member
 import schema.member as schema_member
@@ -87,23 +89,15 @@ async def projects_query(info: Info, filters: Optional[ProjectFilters] = None) -
     user = get_user(info)
 
     if is_super_admin(user):
-        query = (
-            select(models_project.Project)
-            .options(selectinload(models_project.Project.groups))
-            .options(selectinload(models_project.Project.stages))
-            .options(selectinload(models_project.Project.members))
-        )
+        query = select(models_project.Project)
     else:
         query = (
             select(models_project.Project)
             .where(models_member.ProjectMember.user_id == user.claims.get("oid"))
             .join(models_member.ProjectMember)
-            .options(selectinload(models_project.Project.groups))
-            .options(
-                selectinload(models_project.Project.stages).options(selectinload(models_project.ProjectStage.stage))
-            )
-            .options(selectinload(models_project.Project.members))
         )
+
+    query = await graphql_project_options(info, query)
 
     if filters:
         query = filter_model_query(models_project.Project, filters, query)
@@ -380,3 +374,33 @@ async def authenticate_user(id, info):
     if not authenticated_project:
         raise AuthenticationError
     return session
+
+
+async def graphql_project_options(info: Info, query: SelectOfScalar) -> SelectOfScalar:
+    """
+    Optionally "select IN" loads the needed collections of a Project
+    based on the request provided in the info
+
+    Args:
+        info (Info): request information
+        query: current query provided
+
+    Returns: updated query
+    """
+
+    if project_field := [field for field in info.selected_fields if field.name == "projects"]:
+        if stage_field := [field for field in project_field[0].selections if field.name == "stages"]:
+            if [field for field in stage_field[0].selections if field.name == "phase"]:
+                query = query.options(
+                    selectinload(models_project.Project.stages).options(selectinload(models_stage.ProjectStage.stage))
+                )
+            else:
+                query = query.options(selectinload(models_project.Project.stages))
+
+        if [field for field in project_field[0].selections if field.name == "groups"]:
+            query = query.options(selectinload(models_project.Project.groups))
+
+        if [field for field in project_field[0].selections if field.name == "members"]:
+            query = query.options(selectinload(models_project.Project.members))
+
+    return query
