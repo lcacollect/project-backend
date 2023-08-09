@@ -23,7 +23,16 @@ class Project(SQLModel, table=True):
     country: str | None
     image_url: str | None
 
-    groups: list["ProjectGroup"] = Relationship(back_populates="project")
-    stages: list["ProjectStage"] = Relationship(back_populates="project")
-    members: list[ProjectMember] = Relationship(back_populates="project")
+    groups: list["ProjectGroup"] = Relationship(
+        back_populates="project",
+        sa_relationship_kwargs={"cascade": "all,delete"},
+    )
+    stages: list["ProjectStage"] = Relationship(
+        back_populates="project",
+        sa_relationship_kwargs={"cascade": "all,delete"},
+    )
+    members: list[ProjectMember] = Relationship(
+        back_populates="project",
+        sa_relationship_kwargs={"cascade": "all,delete"},
+    )
     meta_fields: dict = Field(default=dict, sa_column=Column(JSON), nullable=False)
