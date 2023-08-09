@@ -7,7 +7,6 @@ from typing import Optional
 import strawberry
 from azure.core.exceptions import ResourceExistsError, ResourceNotFoundError
 from azure.storage.blob.aio import BlobClient
-from fastapi import BackgroundTasks
 from lcacollect_config.context import get_session, get_token, get_user
 from lcacollect_config.exceptions import AuthenticationError, DatabaseItemNotFound
 from lcacollect_config.graphql.input_filters import FilterOptions, filter_model_query
@@ -27,8 +26,12 @@ import schema.member
 import schema.member as schema_member
 from core.config import settings
 from core.federation import (
+    delete_assembly,
+    delete_epds,
     delete_project_source,
     delete_reporting_schema,
+    get_project_assemblies,
+    get_project_epds,
     get_project_sources,
     get_reporting_schema,
 )
@@ -289,27 +292,53 @@ async def delete_project_mutation(info: Info, id: str) -> str:
 
     session = await authenticate_user(id, info)
     project = await session.get(models_project.Project, id)
+
     if not project:
         raise DatabaseItemNotFound(f"Could not find project with id: {id}")
-    background: BackgroundTasks = info.context.get("background_tasks")
-    background.add_task(delete_reporting_schema_and_source, get_token(info), project.id)
+
+    await delete_reporting_schemas(get_token(info), project.id)
+    await delete_project_sources(get_token(info), project.id)
+    await delete_project_assemblies(get_token(info), project.id)
+    await delete_project_epds(get_token(info), project.id)
 
     await session.delete(project)
     await session.commit()
     return id
 
 
-async def delete_reporting_schema_and_source(token: str, project_id: str):
-    """Delete reporting schema and Project Source after project is deleted"""
+async def delete_reporting_schemas(token: str, project_id: str):
+    """Delete reporting schema after project is deleted"""
 
-    reporting_schemas = await get_reporting_schema(project_id, token)
-    project_sources = await get_project_sources(project_id, token)
-    if reporting_schemas:
+    if reporting_schemas := await get_reporting_schema(project_id, token):
         for schema in reporting_schemas:
-            _ = await delete_reporting_schema(schema.get("id"), token)
-    if project_sources:
+            logger.info(f"Deleting reporting schema: {schema.get('id')} for project: {project_id}")
+            await delete_reporting_schema(schema.get("id"), token)
+
+
+async def delete_project_sources(token: str, project_id: str):
+    """Delete project source after project is deleted"""
+
+    if project_sources := await get_project_sources(project_id, token):
         for source in project_sources:
-            _ = await delete_project_source(source.get("id"), token)
+            logger.info(f"Deleting source: {source.get('id')} for project: {project_id}")
+            await delete_project_source(source.get("id"), token)
+
+
+async def delete_project_assemblies(token: str, project_id: str):
+    """Delete assemblies after project is deleted"""
+
+    if assemblies := await get_project_assemblies(project_id, token):
+        for assembly in assemblies:
+            logger.info(f"Deleting assembly: {assembly.get('id')} for project: {project_id}")
+            await delete_assembly(assembly.get("id"), token)
+
+
+async def delete_project_epds(token: str, project_id: str):
+    """Delete epds after project is deleted"""
+
+    if epds := await get_project_epds(project_id, token):
+        logger.info(f"Deleting {len(epds)} epds for project: {project_id}")
+        await delete_epds([epd.get("id") for epd in epds], token)
 
 
 async def handle_file_upload(file: str) -> str:
