@@ -102,6 +102,7 @@ type GraphQLUserAccount {
   name: String!
   roles: [String!]!
   email: String!
+  blobSasToken: String!
 }
 
 """
