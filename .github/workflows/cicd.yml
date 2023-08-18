@@ -21,7 +21,7 @@ jobs:
     with:
       name: 'project'
       branch: ${{ github.ref_name }}
-      storage_account: ${{ vars.PRODUCTION_STORAGE_ACCOUNT }}
+      storage_account: ${{ vars.DEVELOPMENT_STORAGE_ACCOUNT }}
       container_name: ${{ vars.GRAPHQL_CONTAINER_NAME }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
