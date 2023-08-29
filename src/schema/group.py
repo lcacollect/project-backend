@@ -34,7 +34,7 @@ async def get_project_groups_query(
 ) -> list[GraphQLProjectGroup]:
     """Query all Project Groups"""
 
-    session = await authenticate_user(info, project_id)
+    session = await authenticate_user(info, project_id, check_public=True)
 
     if not await project_exists(session, project_id):
         raise DatabaseItemNotFound(f"Project with id: {project_id} does not exist")

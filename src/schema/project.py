@@ -12,7 +12,7 @@ from lcacollect_config.exceptions import AuthenticationError, DatabaseItemNotFou
 from lcacollect_config.graphql.input_filters import FilterOptions, filter_model_query
 from lcacollect_config.validate import is_super_admin
 from sqlalchemy.orm import selectinload
-from sqlmodel import col, select
+from sqlmodel import col, or_, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import SelectOfScalar
 from strawberry.scalars import JSON
@@ -61,6 +61,7 @@ class GraphQLProject:
     city: str | None
     country: str | None
     image_url: str | None
+    public: bool
     meta_fields: Optional[JSON]
 
     groups: list[schema_group.GraphQLProjectGroup] | None
@@ -96,7 +97,11 @@ async def projects_query(info: Info, filters: Optional[ProjectFilters] = None) -
     else:
         query = (
             select(models_project.Project)
-            .where(models_member.ProjectMember.user_id == user.claims.get("oid"))
+            .where(
+                or_(
+                    models_project.Project.public == True, models_member.ProjectMember.user_id == user.claims.get("oid")
+                )
+            )
             .join(models_member.ProjectMember)
         )
 
@@ -149,6 +154,7 @@ async def add_project_mutation(
     members: Optional[list[ProjectMemberInput]] = None,
     groups: Optional[list[ProjectGroupInput]] = None,
     stages: Optional[list[LifeCycleStageInput]] = None,
+    public: Optional[bool] = False,
     meta_fields: Optional[JSON] = None,
 ) -> GraphQLProject:
     """Add a Project"""
@@ -167,6 +173,7 @@ async def add_project_mutation(
         country=country,
         address=address,
         meta_fields=meta_fields,
+        public=public,
     )
     if file:
         project.image_url = await handle_file_upload(file)
@@ -220,6 +227,7 @@ async def update_project_mutation(
     client: Optional[str] = None,
     domain: Optional[ProjectDomain] = None,
     file: Optional[str] = None,
+    public: Optional[bool] = None,
     meta_fields: Optional[JSON] = None,
 ) -> GraphQLProject:
     """Update a Project"""
@@ -242,15 +250,16 @@ async def update_project_mutation(
         "address": address,
         "city": city,
         "country": country,
+        "public": public,
     }
     if file:
         image_url = await handle_file_upload(file)
         kwargs["image_url"] = image_url
 
     for key, value in kwargs.items():
-        if value and key != "meta_fields":
+        if value is not None and key != "meta_fields":
             setattr(project, key, value)
-        if value and key == "meta_fields":
+        elif value and key == "meta_fields":
             fields = {**project.meta_fields, **value}
             project.meta_fields = fields
 
