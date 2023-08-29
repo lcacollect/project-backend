@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Annotated, Optional
 
 import strawberry
 from fastapi import HTTPException
+from lcacollect_config.context import get_session
 from lcacollect_config.email import EmailType, send_email
 from lcacollect_config.graphql.input_filters import filter_model_query
 from lcacollect_config.user import (
@@ -48,7 +49,7 @@ async def project_members_query(
     Filters can be used to query unique members of the Project
     """
 
-    session = info.context.get("session")
+    session = get_session(info)
     await project_exists(session, project_id)
 
     query = (

@@ -14,11 +14,12 @@ alembic = "*"
 tenacity = "*"
 sqlalchemy = {extras = ["asyncio"], version = "==1.4.35"}
 specklepy = "*"
-lcacollect-config = ">=1.6.1"
+lcacollect-config = ">=1.7.0"
 azure-storage-blob = "*"
 aiohttp = "*"
 aiocache = "*"
 httpx = "==0.23.3"
+
 
 [dev-packages]
 pydevd-pycharm = "~=232.8660.197"

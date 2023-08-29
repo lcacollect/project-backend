@@ -26,9 +26,9 @@ async def test_get_projects(client: AsyncClient, project_with_members):
     assert not data.get("errors")
     assert data["data"]["projects"] == [
         {"name": "Project 0"},
-        {"name": "Project 0"},
         {"name": "Project 1"},
         {"name": "Project 2"},
+        {"name": "Project 0"},
     ]
 
 

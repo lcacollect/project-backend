@@ -22,6 +22,7 @@ class Project(SQLModel, table=True):
     city: str | None
     country: str | None
     image_url: str | None
+    public: bool = Field(default=False, nullable=False)
 
     groups: list["ProjectGroup"] = Relationship(
         back_populates="project",
