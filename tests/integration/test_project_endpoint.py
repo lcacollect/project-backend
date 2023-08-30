@@ -24,11 +24,10 @@ async def test_get_projects(client: AsyncClient, project_with_members):
     data = response.json()
     print(data)
     assert not data.get("errors")
-    assert data["data"]["projects"] == [
+    assert sorted(data["data"]["projects"], key=lambda x: x.get("name")) == [
         {"name": "Project 0"},
         {"name": "Project 1"},
         {"name": "Project 2"},
-        {"name": "Project 0"},
     ]
 
 
@@ -52,7 +51,7 @@ async def test_get_projects_with_filters(client: AsyncClient, project_with_membe
     print(data)
 
     assert not data.get("errors")
-    assert len(data["data"]["projects"]) == 2
+    assert len(data["data"]["projects"]) == 1
     assert data["data"]["projects"][0] == {"name": project_with_members.name}
 
 
@@ -76,7 +75,7 @@ async def test_get_projects_with_json_filters(client: AsyncClient, project_with_
     print(data)
 
     assert not data.get("errors")
-    assert len(data["data"]["projects"]) == 4
+    assert len(data["data"]["projects"]) == 3
     assert data["data"]["projects"][0] == {"metaFields": {"domain": "design"}}
 
 

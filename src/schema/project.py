@@ -103,7 +103,7 @@ async def projects_query(info: Info, filters: Optional[ProjectFilters] = None) -
                 )
             )
             .join(models_member.ProjectMember)
-        )
+        ).distinct(models_project.Project.id)
 
     query = await graphql_project_options(info, query)
 
