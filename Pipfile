@@ -14,7 +14,7 @@ alembic = "*"
 tenacity = "*"
 sqlalchemy = {extras = ["asyncio"], version = "==1.4.35"}
 specklepy = "*"
-lcacollect-config = ">=1.7.0"
+lcacollect-config = ">=1.7.2"
 azure-storage-blob = "*"
 aiohttp = "*"
 aiocache = "*"
