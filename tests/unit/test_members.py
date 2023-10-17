@@ -28,7 +28,7 @@ from schema.member import GraphQLProjectMember
 @pytest.mark.skip("For local testing of the MS Graph API")
 @pytest.mark.asyncio
 async def test_get_user_from_azure():
-    from schema.member import get_users_from_azure
+    from lcacollect_config.user import get_users_from_azure
 
     users = await get_users_from_azure("f8a9e659-ce95-49cf-b45d-5b0a867a4a17")
     assert users

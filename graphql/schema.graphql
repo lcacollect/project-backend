@@ -16,6 +16,7 @@ input FilterOptions {
   isEmpty: Boolean = null
   isNotEmpty: Boolean = null
   isAnyOf: [String!] = null
+  isTrue: Boolean = null
   jsonContains: String = null
 }
 
@@ -42,6 +43,7 @@ type GraphQLProject @keys(fields: "project_id") {
   city: String
   country: String
   imageUrl: String
+  public: Boolean!
   metaFields: JSON
   groups: [GraphQLProjectGroup!]
   stages: [GraphQLProjectStage!]
@@ -102,6 +104,7 @@ type GraphQLUserAccount {
   name: String!
   roles: [String!]!
   email: String!
+  blobSasToken: String!
 }
 
 """
@@ -115,10 +118,10 @@ input LifeCycleStageInput {
 
 type Mutation {
   """Add a Project"""
-  addProject(name: String!, projectId: String = null, client: String = null, domain: ProjectDomain = null, address: String = null, city: String = null, country: String = null, file: String = null, members: [ProjectMemberInput!] = null, groups: [ProjectGroupInput!] = null, stages: [LifeCycleStageInput!] = null, metaFields: JSON = null): GraphQLProject!
+  addProject(name: String!, projectId: String = null, client: String = null, domain: ProjectDomain = null, address: String = null, city: String = null, country: String = null, file: String = null, members: [ProjectMemberInput!] = null, groups: [ProjectGroupInput!] = null, stages: [LifeCycleStageInput!] = null, public: Boolean = false, metaFields: JSON = null): GraphQLProject!
 
   """Update a Project"""
-  updateProject(id: String!, projectId: String = null, name: String = null, address: String = null, city: String = null, country: String = null, client: String = null, domain: ProjectDomain = null, file: String = null, metaFields: JSON = null): GraphQLProject!
+  updateProject(id: String!, projectId: String = null, name: String = null, address: String = null, city: String = null, country: String = null, client: String = null, domain: ProjectDomain = null, file: String = null, public: Boolean = null, metaFields: JSON = null): GraphQLProject!
 
   """Delete a project"""
   deleteProject(id: String!): String!

@@ -17,12 +17,15 @@ async def project_exists(session: AsyncSession, project_id: str) -> bool:
     return True
 
 
-async def authenticate_user(info: Info, project_id: str) -> AsyncSession:
+async def authenticate_user(info: Info, project_id: str, check_public: bool = False) -> AsyncSession:
     """Check that user has access to project data"""
 
     session = get_session(info)
     user = get_user(info)
     if is_super_admin(user):
+        return session
+
+    if (await session.get(Project, project_id)).public is True and check_public is True:
         return session
 
     query = (
@@ -33,7 +36,7 @@ async def authenticate_user(info: Info, project_id: str) -> AsyncSession:
             Project.id == project_id,
         )
     )
-    authenticated_project = await session.exec(query)
+    authenticated_project = (await session.exec(query)).first()
     if not authenticated_project:
         raise AuthenticationError
 

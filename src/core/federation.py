@@ -65,7 +65,7 @@ async def get_author(info: Info, root: "GraphQLTask") -> "GraphQLProjectMember":
 
 async def get_member(info: Info, member_id: str):
     """Queries a single Project Member from Azure"""
-    from schema.member import get_users_from_azure
+    from lcacollect_config.user import get_users_from_azure
 
     session = get_session(info)
     try:
@@ -334,6 +334,28 @@ class GraphQLComment:
         return await get_comment("", id, get_token(info))
 
 
+async def microservice_query(token: str, query: str, variables: dict | None = None) -> dict | None:
+    async with httpx.AsyncClient(
+        headers={"authorization": f"Bearer {token}"},
+    ) as client:
+        try:
+            response = await client.post(
+                f"{settings.ROUTER_URL}/graphql",
+                json={
+                    "query": query,
+                    "variables": variables,
+                },
+            )
+        except httpx.HTTPError as e:
+            raise MicroServiceConnectionError(f"Could not receive data from {settings.ROUTER_URL}. Got {e}")
+        if response.is_error:
+            raise MicroServiceConnectionError(f"Could not receive data from {settings.ROUTER_URL}. Got {response.text}")
+        data = response.json()
+        if errors := data.get("errors"):
+            raise MicroServiceResponseError(f"Got error from {settings.ROUTER_URL}: {errors}")
+        return data.get("data")
+
+
 async def delete_project_source(id: str, token: str):
     """Delete a project source"""
 
@@ -345,22 +367,8 @@ async def delete_project_source(id: str, token: str):
         }
     """
 
-    async with httpx.AsyncClient(
-        headers={"authorization": f"Bearer {token}"},
-    ) as client:
-        response = await client.post(
-            f"{settings.ROUTER_URL}/graphql",
-            json={
-                "query": query,
-                "variables": {"id": id},
-            },
-        )
-        if response.is_error:
-            raise MicroServiceConnectionError(f"Could not receive data from {settings.ROUTER_URL}. Got {response.text}")
-        data = response.json()
-        if errors := data.get("errors"):
-            raise MicroServiceResponseError(f"Got error from {settings.ROUTER_URL}: {errors}")
-    return data["data"]["deleteProjectSource"]["id"]
+    data = await microservice_query(token, query, {"id": id})
+    return data.get("deleteProjectSource", {}).get("id")
 
 
 async def delete_reporting_schema(id: str, token: str):
@@ -368,28 +376,12 @@ async def delete_reporting_schema(id: str, token: str):
 
     query = """
         mutation($id: String!) {
-            deleteReportingSchema(id: $id) {
-                id
-            }
+            deleteReportingSchema(id: $id)
         }
     """
 
-    async with httpx.AsyncClient(
-        headers={"authorization": f"Bearer {token}"},
-    ) as client:
-        response = await client.post(
-            f"{settings.ROUTER_URL}/graphql",
-            json={
-                "query": query,
-                "variables": {"id": id},
-            },
-        )
-        if response.is_error:
-            raise MicroServiceConnectionError(f"Could not receive data from {settings.ROUTER_URL}. Got {response.text}")
-        data = response.json()
-        if errors := data.get("errors"):
-            raise MicroServiceResponseError(f"Got error from {settings.ROUTER_URL}: {errors}")
-    return data["data"]["deleteReportingSchema"]["id"]
+    data = await microservice_query(token, query, {"id": id})
+    return data.get("deleteReportingSchema", {})
 
 
 async def get_reporting_schema(project_id: str, token: str) -> list[dict]:
@@ -406,24 +398,8 @@ async def get_reporting_schema(project_id: str, token: str) -> list[dict]:
             }
         }
     """
-
-    async with httpx.AsyncClient(
-        headers={"authorization": f"Bearer {token}"},
-    ) as client:
-        response = await client.post(
-            f"{settings.ROUTER_URL}/graphql",
-            json={
-                "query": query,
-                "variables": {"projectId": project_id},
-            },
-        )
-        if response.is_error:
-            raise MicroServiceConnectionError(f"Could not receive data from {settings.ROUTER_URL}. Got {response.text}")
-        data = response.json()
-        if errors := data.get("errors"):
-            raise MicroServiceResponseError(f"Got error from {settings.ROUTER_URL}: {errors}")
-
-        return data.get("data", {}).get("reportingSchemas")
+    data = await microservice_query(token, query, {"projectId": project_id})
+    return data.get("reportingSchemas")
 
 
 async def get_project_sources(project_id: str, token: str) -> list[dict]:
@@ -442,20 +418,61 @@ async def get_project_sources(project_id: str, token: str) -> list[dict]:
         }
     """
 
-    async with httpx.AsyncClient(
-        headers={"authorization": f"Bearer {token}"},
-    ) as client:
-        response = await client.post(
-            f"{settings.ROUTER_URL}/graphql",
-            json={
-                "query": query,
-                "variables": {"projectId": project_id},
-            },
-        )
-        if response.is_error:
-            raise MicroServiceConnectionError(f"Could not receive data from {settings.ROUTER_URL}. Got {response.text}")
-        data = response.json()
-        if errors := data.get("errors"):
-            raise MicroServiceResponseError(f"Got error from {settings.ROUTER_URL}: {errors}")
+    data = await microservice_query(token, query, {"projectId": project_id})
+    return data.get("projectSources")
 
-        return data.get("data", {}).get("projectSources")
+
+async def get_project_assemblies(project_id: str, token: str) -> list[dict]:
+    """Get project assemblies"""
+
+    query = """
+        query($projectId: String!) {
+            assemblies(projectId: $projectId) {
+                id
+            }
+        }
+    """
+
+    data = await microservice_query(token, query, {"projectId": project_id})
+    return data.get("assemblies")
+
+
+async def get_project_epds(project_id: str, token: str) -> list[dict]:
+    """Get project epds"""
+
+    query = """
+        query($projectId: String!) {
+            projectEpds(projectId: $projectId) {
+                id
+            }
+        }
+    """
+
+    data = await microservice_query(token, query, {"projectId": project_id})
+    return data.get("projectEpds")
+
+
+async def delete_assembly(id: str, token: str) -> dict:
+    """Delete assembly"""
+
+    query = """
+        mutation($id: String!) {
+            deleteAssembly(id: $id)
+        }
+    """
+
+    data = await microservice_query(token, query, {"id": id})
+    return data
+
+
+async def delete_epds(ids: list[str], token: str) -> dict:
+    """Delete epds"""
+
+    query = """
+        mutation($ids: [String!]!) {
+            deleteProjectEpds(ids: $ids)
+        }
+    """
+
+    data = await microservice_query(token, query, {"ids": ids})
+    return data

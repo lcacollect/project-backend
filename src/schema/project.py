@@ -7,26 +7,31 @@ from typing import Optional
 import strawberry
 from azure.core.exceptions import ResourceExistsError, ResourceNotFoundError
 from azure.storage.blob.aio import BlobClient
-from fastapi import BackgroundTasks
 from lcacollect_config.context import get_session, get_token, get_user
 from lcacollect_config.exceptions import AuthenticationError, DatabaseItemNotFound
 from lcacollect_config.graphql.input_filters import FilterOptions, filter_model_query
 from lcacollect_config.validate import is_super_admin
 from sqlalchemy.orm import selectinload
-from sqlmodel import col, select
+from sqlmodel import col, or_, select
 from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlmodel.sql.expression import SelectOfScalar
 from strawberry.scalars import JSON
 from strawberry.types import Info
 
 import models.member as models_member
 import models.project as models_project
+import models.stage as models_stage
 import schema.group as schema_group
 import schema.member
 import schema.member as schema_member
 from core.config import settings
 from core.federation import (
+    delete_assembly,
+    delete_epds,
     delete_project_source,
     delete_reporting_schema,
+    get_project_assemblies,
+    get_project_epds,
     get_project_sources,
     get_reporting_schema,
 )
@@ -56,6 +61,7 @@ class GraphQLProject:
     city: str | None
     country: str | None
     image_url: str | None
+    public: bool
     meta_fields: Optional[JSON]
 
     groups: list[schema_group.GraphQLProjectGroup] | None
@@ -87,21 +93,19 @@ async def projects_query(info: Info, filters: Optional[ProjectFilters] = None) -
     user = get_user(info)
 
     if is_super_admin(user):
-        query = (
-            select(models_project.Project)
-            .options(selectinload(models_project.Project.groups))
-            .options(selectinload(models_project.Project.stages))
-            .options(selectinload(models_project.Project.members))
-        )
+        query = select(models_project.Project)
     else:
         query = (
             select(models_project.Project)
-            .where(models_member.ProjectMember.user_id == user.claims.get("oid"))
+            .where(
+                or_(
+                    models_project.Project.public == True, models_member.ProjectMember.user_id == user.claims.get("oid")
+                )
+            )
             .join(models_member.ProjectMember)
-            .options(selectinload(models_project.Project.groups))
-            .options(selectinload(models_project.Project.stages))
-            .options(selectinload(models_project.Project.members))
-        )
+        ).distinct(models_project.Project.id)
+
+    query = await graphql_project_options(info, query)
 
     if filters:
         query = filter_model_query(models_project.Project, filters, query)
@@ -150,6 +154,7 @@ async def add_project_mutation(
     members: Optional[list[ProjectMemberInput]] = None,
     groups: Optional[list[ProjectGroupInput]] = None,
     stages: Optional[list[LifeCycleStageInput]] = None,
+    public: Optional[bool] = False,
     meta_fields: Optional[JSON] = None,
 ) -> GraphQLProject:
     """Add a Project"""
@@ -168,6 +173,7 @@ async def add_project_mutation(
         country=country,
         address=address,
         meta_fields=meta_fields,
+        public=public,
     )
     if file:
         project.image_url = await handle_file_upload(file)
@@ -221,6 +227,7 @@ async def update_project_mutation(
     client: Optional[str] = None,
     domain: Optional[ProjectDomain] = None,
     file: Optional[str] = None,
+    public: Optional[bool] = None,
     meta_fields: Optional[JSON] = None,
 ) -> GraphQLProject:
     """Update a Project"""
@@ -243,15 +250,16 @@ async def update_project_mutation(
         "address": address,
         "city": city,
         "country": country,
+        "public": public,
     }
     if file:
         image_url = await handle_file_upload(file)
         kwargs["image_url"] = image_url
 
     for key, value in kwargs.items():
-        if value and key != "meta_fields":
+        if value is not None and key != "meta_fields":
             setattr(project, key, value)
-        if value and key == "meta_fields":
+        elif value and key == "meta_fields":
             fields = {**project.meta_fields, **value}
             project.meta_fields = fields
 
@@ -293,27 +301,53 @@ async def delete_project_mutation(info: Info, id: str) -> str:
 
     session = await authenticate_user(id, info)
     project = await session.get(models_project.Project, id)
+
     if not project:
         raise DatabaseItemNotFound(f"Could not find project with id: {id}")
-    background: BackgroundTasks = info.context.get("background_tasks")
-    background.add_task(delete_reporting_schema_and_source, get_token(info), project.id)
+
+    await delete_reporting_schemas(get_token(info), project.id)
+    await delete_project_sources(get_token(info), project.id)
+    await delete_project_assemblies(get_token(info), project.id)
+    await delete_project_epds(get_token(info), project.id)
 
     await session.delete(project)
     await session.commit()
     return id
 
 
-async def delete_reporting_schema_and_source(token: str, project_id: str):
-    """Delete reporting schema and Project Source after project is deleted"""
+async def delete_reporting_schemas(token: str, project_id: str):
+    """Delete reporting schema after project is deleted"""
 
-    reporting_schemas = await get_reporting_schema(project_id, token)
-    project_sources = await get_project_sources(project_id, token)
-    if reporting_schemas:
+    if reporting_schemas := await get_reporting_schema(project_id, token):
         for schema in reporting_schemas:
-            _ = await delete_reporting_schema(schema.get("id"), token)
-    if project_sources:
+            logger.info(f"Deleting reporting schema: {schema.get('id')} for project: {project_id}")
+            await delete_reporting_schema(schema.get("id"), token)
+
+
+async def delete_project_sources(token: str, project_id: str):
+    """Delete project source after project is deleted"""
+
+    if project_sources := await get_project_sources(project_id, token):
         for source in project_sources:
-            _ = await delete_project_source(source.get("id"), token)
+            logger.info(f"Deleting source: {source.get('id')} for project: {project_id}")
+            await delete_project_source(source.get("id"), token)
+
+
+async def delete_project_assemblies(token: str, project_id: str):
+    """Delete assemblies after project is deleted"""
+
+    if assemblies := await get_project_assemblies(project_id, token):
+        for assembly in assemblies:
+            logger.info(f"Deleting assembly: {assembly.get('id')} for project: {project_id}")
+            await delete_assembly(assembly.get("id"), token)
+
+
+async def delete_project_epds(token: str, project_id: str):
+    """Delete epds after project is deleted"""
+
+    if epds := await get_project_epds(project_id, token):
+        logger.info(f"Deleting {len(epds)} epds for project: {project_id}")
+        await delete_epds([epd.get("id") for epd in epds], token)
 
 
 async def handle_file_upload(file: str) -> str:
@@ -378,3 +412,33 @@ async def authenticate_user(id, info):
     if not authenticated_project:
         raise AuthenticationError
     return session
+
+
+async def graphql_project_options(info: Info, query: SelectOfScalar) -> SelectOfScalar:
+    """
+    Optionally "select IN" loads the needed collections of a Project
+    based on the request provided in the info
+
+    Args:
+        info (Info): request information
+        query: current query provided
+
+    Returns: updated query
+    """
+
+    if project_field := [field for field in info.selected_fields if field.name == "projects"]:
+        if stage_field := [field for field in project_field[0].selections if field.name == "stages"]:
+            if [field for field in stage_field[0].selections if field.name == "phase"]:
+                query = query.options(
+                    selectinload(models_project.Project.stages).options(selectinload(models_stage.ProjectStage.stage))
+                )
+            else:
+                query = query.options(selectinload(models_project.Project.stages))
+
+        if [field for field in project_field[0].selections if field.name == "groups"]:
+            query = query.options(selectinload(models_project.Project.groups))
+
+        if [field for field in project_field[0].selections if field.name == "members"]:
+            query = query.options(selectinload(models_project.Project.members))
+
+    return query

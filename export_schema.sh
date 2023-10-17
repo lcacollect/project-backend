@@ -23,7 +23,7 @@ export STORAGE_CONTAINER_NAME=PALCEHOLDER
 export STORAGE_ACCESS_KEY=PLACEHOLDER
 export STORAGE_BASE_PATH=test
 export EMAIL_NOTIFICATION_FROM=no-reply@arkitema.com
-export INTERNAL_EMAIL_DOMAIN_NAMES=arkitema,cowi,cowicloud
+export INTERNAL_EMAIL_DOMAINS_LIST=arkitema,cowi,cowicloud
 export DEFAULT_AD_FQDN=cowi.onmicrosoft.com
 
 # Export GraphQL schema

@@ -24,8 +24,7 @@ async def test_get_projects(client: AsyncClient, project_with_members):
     data = response.json()
     print(data)
     assert not data.get("errors")
-    assert data["data"]["projects"] == [
-        {"name": "Project 0"},
+    assert sorted(data["data"]["projects"], key=lambda x: x.get("name")) == [
         {"name": "Project 0"},
         {"name": "Project 1"},
         {"name": "Project 2"},
@@ -52,7 +51,7 @@ async def test_get_projects_with_filters(client: AsyncClient, project_with_membe
     print(data)
 
     assert not data.get("errors")
-    assert len(data["data"]["projects"]) == 2
+    assert len(data["data"]["projects"]) == 1
     assert data["data"]["projects"][0] == {"name": project_with_members.name}
 
 
@@ -76,7 +75,7 @@ async def test_get_projects_with_json_filters(client: AsyncClient, project_with_
     print(data)
 
     assert not data.get("errors")
-    assert len(data["data"]["projects"]) == 4
+    assert len(data["data"]["projects"]) == 3
     assert data["data"]["projects"][0] == {"metaFields": {"domain": "design"}}
 
 
@@ -314,6 +313,26 @@ async def test_delete_project(client: AsyncClient, projects, db, httpx_mock: HTT
         }
     }
 
+    assemblies_get_mock = {
+        "data": {
+            "assemblies": [
+                {
+                    "id": "1010101-ce95-49cf-b45d-5b0a867a4a17",
+                }
+            ]
+        }
+    }
+
+    project_epds_get_mock = {
+        "data": {
+            "projectEpds": [
+                {
+                    "id": "1010101-ce95-49cf-b45d-5b0a867a4a17",
+                }
+            ]
+        }
+    }
+
     httpx_mock.add_response(
         url=f"{settings.ROUTER_URL}/graphql",
         json=reporting_schemas_mock,
@@ -331,12 +350,39 @@ async def test_delete_project(client: AsyncClient, projects, db, httpx_mock: HTT
     httpx_mock.add_response(
         url=f"{settings.ROUTER_URL}/graphql",
         json=reporting_schemas_delete_mock,
-        match_content=b'{"query": "\\n        mutation($id: String!) {\\n            deleteReportingSchema(id: $id) {\\n                id\\n            }\\n        }\\n    ", "variables": {"id": "1010101-ce95-49cf-b45d-5b0a867a4a17"}}',
+        match_content=b'{"query": "\\n        mutation($id: String!) {\\n            deleteReportingSchema(id: $id)\\n        }\\n    ", "variables": {"id": "1010101-ce95-49cf-b45d-5b0a867a4a17"}}',
     )
     httpx_mock.add_response(
         url=f"{settings.ROUTER_URL}/graphql",
         json=schema_sources_delete_mock,
         match_content=b'{"query": "\\n        mutation($id: String!) {\\n            deleteProjectSource(id: $id) {\\n                id\\n            }\\n        }\\n    ", "variables": {"id": "1010101-ce95-49cf-b45d-5b0a867a4a17"}}',
+    )
+
+    httpx_mock.add_response(
+        url=f"{settings.ROUTER_URL}/graphql",
+        json=assemblies_get_mock,
+        match_content=b'{"query": "\\n        query($projectId: String!) {\\n            assemblies(projectId: $projectId) {\\n                id\\n            }\\n        }\\n    ", "variables": {"projectId": "'
+        + projects[0].id.encode()
+        + b'"}}',
+    )
+
+    httpx_mock.add_response(
+        url=f"{settings.ROUTER_URL}/graphql",
+        json={"data": {"deleteAssembly": "1010101-ce95-49cf-b45d-5b0a867a4a17"}},
+        match_content=b'{"query": "\\n        mutation($id: String!) {\\n            deleteAssembly(id: $id)\\n        }\\n    ", "variables": {"id": "1010101-ce95-49cf-b45d-5b0a867a4a17"}}',
+    )
+
+    httpx_mock.add_response(
+        url=f"{settings.ROUTER_URL}/graphql",
+        json=project_epds_get_mock,
+        match_content=b'{"query": "\\n        query($projectId: String!) {\\n            projectEpds(projectId: $projectId) {\\n                id\\n            }\\n        }\\n    ", "variables": {"projectId": "'
+        + projects[0].id.encode()
+        + b'"}}',
+    )
+    httpx_mock.add_response(
+        url=f"{settings.ROUTER_URL}/graphql",
+        json={"data": {"deleteProjectEpds": "1010101-ce95-49cf-b45d-5b0a867a4a17"}},
+        match_content=b'{"query": "\\n        mutation($ids: [String!]!) {\\n            deleteProjectEpds(ids: $ids)\\n        }\\n    ", "variables": {"ids": ["1010101-ce95-49cf-b45d-5b0a867a4a17"]}}',
     )
 
     query = """

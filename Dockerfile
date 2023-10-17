@@ -1,4 +1,4 @@
-FROM python:3.10-slim as builder
+FROM python:3.11-slim as builder
 
 ARG BUILD_STAGE
 RUN python -m pip install --upgrade pip
@@ -14,9 +14,10 @@ RUN bash -c "if [ $BUILD_STAGE = 'DEV' ]; \
     else pipenv requirements > requirements.txt; \
     fi"
 
+RUN apt-get update && apt-get install gcc python3-dev -y
 RUN pip wheel -r requirements.txt -w /tmp/wheels
 
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 # Copy from previous stage
 COPY --from=builder /tmp /tmp

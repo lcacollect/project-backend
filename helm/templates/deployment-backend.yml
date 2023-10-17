@@ -150,7 +150,7 @@ spec:
             - name: ROUTER_URL
               value: {{ .Values.backend.routerUrl }}
             
-            - name: INTERNAL_EMAIL_DOMAIN_NAMES
+            - name: INTERNAL_EMAIL_DOMAINS_LIST
               value: '{{ .Values.backend.internalEmailDomains }}'
             
             - name: DEFAULT_AD_FQDN
