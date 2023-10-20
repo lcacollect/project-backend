@@ -14,7 +14,7 @@ RUN bash -c "if [ $BUILD_STAGE = 'DEV' ]; \
     else pipenv requirements > requirements.txt; \
     fi"
 
-RUN apt-get update && apt-get install gcc python3-dev -y
+RUN apt-get update && apt-get install gcc python3-dev jq -y
 RUN pip wheel -r requirements.txt -w /tmp/wheels
 
 FROM python:3.11-slim

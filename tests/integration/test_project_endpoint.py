@@ -361,7 +361,7 @@ async def test_delete_project(client: AsyncClient, projects, db, httpx_mock: HTT
     httpx_mock.add_response(
         url=f"{settings.ROUTER_URL}/graphql",
         json=assemblies_get_mock,
-        match_content=b'{"query": "\\n        query($projectId: String!) {\\n            assemblies(projectId: $projectId) {\\n                id\\n            }\\n        }\\n    ", "variables": {"projectId": "'
+        match_content=b'{"query": "\\n        query($projectId: String!) {\\n            projectAssemblies(projectId: $projectId) {\\n                id\\n            }\\n        }\\n    ", "variables": {"projectId": "'
         + projects[0].id.encode()
         + b'"}}',
     )
