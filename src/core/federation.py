@@ -427,7 +427,7 @@ async def get_project_assemblies(project_id: str, token: str) -> list[dict]:
 
     query = """
         query($projectId: String!) {
-            assemblies(projectId: $projectId) {
+            projectAssemblies(projectId: $projectId) {
                 id
             }
         }

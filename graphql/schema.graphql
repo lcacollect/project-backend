@@ -16,7 +16,6 @@ input FilterOptions {
   isEmpty: Boolean = null
   isNotEmpty: Boolean = null
   isAnyOf: [String!] = null
-  isTrue: Boolean = null
   jsonContains: String = null
 }
 
