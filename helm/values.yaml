@@ -63,3 +63,8 @@ backend:
   adTenantId: ""
   adOpenApiClientId: ""
   adAppClientId: ""
+  azure:
+    postgresUser: ""
+    postgresHost: ""
+    postgresPort: ""
+    postgresPassword: ""
