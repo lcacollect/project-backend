@@ -31,6 +31,8 @@ ENV PATH=/app/.local/bin:$PATH
 ENV PYTHONPATH "${PYTHONPATH}:/app/src"
 ENV BUILD_VERSION $BUILD_VERSION
 
+RUN apt-get update && apt-get install postgresql-client -y
+
 # Create fastapi user
 RUN useradd --home-dir /app --create-home fastapi
 USER fastapi
