@@ -315,7 +315,7 @@ async def test_delete_project(client: AsyncClient, projects, db, httpx_mock: HTT
 
     assemblies_get_mock = {
         "data": {
-            "assemblies": [
+            "projectAssemblies": [
                 {
                     "id": "1010101-ce95-49cf-b45d-5b0a867a4a17",
                 }
@@ -368,8 +368,8 @@ async def test_delete_project(client: AsyncClient, projects, db, httpx_mock: HTT
 
     httpx_mock.add_response(
         url=f"{settings.ROUTER_URL}/graphql",
-        json={"data": {"deleteAssembly": "1010101-ce95-49cf-b45d-5b0a867a4a17"}},
-        match_content=b'{"query": "\\n        mutation($id: String!) {\\n            deleteAssembly(id: $id)\\n        }\\n    ", "variables": {"id": "1010101-ce95-49cf-b45d-5b0a867a4a17"}}',
+        json={"data": {"deleteProjectAssemblies": "1010101-ce95-49cf-b45d-5b0a867a4a17"}},
+        match_content=b'{"query": "\\n        mutation($ids: [ID!]!) {\\n            deleteProjectAssemblies(ids: $ids)\\n        }\\n    ", "variables": {"ids": ["1010101-ce95-49cf-b45d-5b0a867a4a17"]}}',
     )
 
     httpx_mock.add_response(

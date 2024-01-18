@@ -434,7 +434,7 @@ async def get_project_assemblies(project_id: str, token: str) -> list[dict]:
     """
 
     data = await microservice_query(token, query, {"projectId": project_id})
-    return data.get("assemblies")
+    return data.get("projectAssemblies")
 
 
 async def get_project_epds(project_id: str, token: str) -> list[dict]:
@@ -452,16 +452,16 @@ async def get_project_epds(project_id: str, token: str) -> list[dict]:
     return data.get("projectEpds")
 
 
-async def delete_assembly(id: str, token: str) -> dict:
+async def delete_assemblies(ids: list[str], token: str) -> dict:
     """Delete assembly"""
 
     query = """
-        mutation($id: String!) {
-            deleteAssembly(id: $id)
+        mutation($ids: [ID!]!) {
+            deleteProjectAssemblies(ids: $ids)
         }
     """
 
-    data = await microservice_query(token, query, {"id": id})
+    data = await microservice_query(token, query, {"ids": ids})
     return data
 
 
