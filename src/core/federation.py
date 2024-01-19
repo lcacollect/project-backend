@@ -453,7 +453,7 @@ async def get_project_epds(project_id: str, token: str) -> list[dict]:
 
 
 async def delete_assemblies(ids: list[str], token: str) -> dict:
-    """Delete assembly"""
+    """Delete assemblies"""
 
     query = """
         mutation($ids: [ID!]!) {
