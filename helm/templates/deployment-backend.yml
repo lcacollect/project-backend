@@ -155,3 +155,17 @@ spec:
             
             - name: DEFAULT_AD_FQDN
               value: {{ .Values.backend.defaultAdFQDN }}
+
+{{- if eq .Values.deployType "DEV" }}
+            - name: AZURE_POSTGRES_USER
+              value: {{ .Values.backend.azure.postgresUser }}
+
+            - name: AZURE_POSTGRES_HOST
+              value: {{ .Values.backend.azure.postgresHost }}
+
+            - name: AZURE_POSTGRES_PORT
+              value: '{{ .Values.backend.azure.postgresPort }}'
+
+            - name: AZURE_POSTGRES_PASSWORD
+              value: {{ .Values.backend.azure.postgresPassword }}
+{{- end }}

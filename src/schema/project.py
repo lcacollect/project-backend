@@ -26,7 +26,7 @@ import schema.member
 import schema.member as schema_member
 from core.config import settings
 from core.federation import (
-    delete_assembly,
+    delete_assemblies,
     delete_epds,
     delete_project_source,
     delete_reporting_schema,
@@ -335,16 +335,13 @@ async def delete_project_sources(token: str, project_id: str):
 
 async def delete_project_assemblies(token: str, project_id: str):
     """Delete assemblies after project is deleted"""
-
     if assemblies := await get_project_assemblies(project_id, token):
-        for assembly in assemblies:
-            logger.info(f"Deleting assembly: {assembly.get('id')} for project: {project_id}")
-            await delete_assembly(assembly.get("id"), token)
+        logger.info(f"Deleting {len(assemblies)} assemblies for project: {project_id}")
+        await delete_assemblies([assembly.get("id") for assembly in assemblies], token)
 
 
 async def delete_project_epds(token: str, project_id: str):
     """Delete epds after project is deleted"""
-
     if epds := await get_project_epds(project_id, token):
         logger.info(f"Deleting {len(epds)} epds for project: {project_id}")
         await delete_epds([epd.get("id") for epd in epds], token)

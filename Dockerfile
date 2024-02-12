@@ -14,7 +14,7 @@ RUN bash -c "if [ $BUILD_STAGE = 'DEV' ]; \
     else pipenv requirements > requirements.txt; \
     fi"
 
-RUN apt-get update && apt-get install gcc python3-dev -y
+RUN apt-get update && apt-get install gcc python3-dev jq -y
 RUN pip wheel -r requirements.txt -w /tmp/wheels
 
 FROM python:3.11-slim
@@ -30,6 +30,8 @@ ARG BUILD_VERSION
 ENV PATH=/app/.local/bin:$PATH
 ENV PYTHONPATH "${PYTHONPATH}:/app/src"
 ENV BUILD_VERSION $BUILD_VERSION
+
+RUN apt-get update && apt-get install postgresql-client -y
 
 # Create fastapi user
 RUN useradd --home-dir /app --create-home fastapi
