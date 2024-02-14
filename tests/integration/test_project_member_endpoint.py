@@ -5,6 +5,7 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.config import settings
+from exceptions import MSGraphException
 from models.member import ProjectMember
 
 
@@ -46,6 +47,48 @@ async def test_get_project_members(client: AsyncClient, mock_members_from_azure,
         "leaderOf",
         "projectGroups",
     }
+
+
+@pytest.mark.asyncio
+async def test_get_project_members_not_exists_in_azure(client: AsyncClient, project_with_members, mocker):
+    mocker.patch("core.validate.project_exists", return_value=True)
+    mocker.patch("schema.member.get_users_from_azure", side_effect=MSGraphException("error"))
+    query = """
+        query($projectId: String!) {
+            projectMembers(projectId: $projectId) {
+                email
+                name
+                company
+                lastLogin
+                leaderOf{
+                    name
+                }
+                projectGroups{
+                    name
+                }
+            }
+        }
+    """
+    response = await client.post(
+        f"{settings.API_STR}/graphql",
+        json={"query": query, "variables": {"projectId": project_with_members.id}},
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert not data.get("errors")
+    assert len(data["data"]["projectMembers"]) == 4
+
+    for member in data["data"]["projectMembers"]:
+        for key in member.keys():
+            print(key, member[key])
+            if key in ("company", "lastLogin"):
+                assert member[key] is None
+            elif key in ("leaderOf", "projectGroups"):
+                assert member[key] == []
+            else:
+                assert member[key] == ""
 
 
 @pytest.mark.asyncio

@@ -1,3 +1,4 @@
+import logging
 from datetime import date
 from typing import TYPE_CHECKING, Annotated, Optional
 
@@ -21,7 +22,10 @@ import models.group as models_group
 import models.member as models_member
 import models.project as models_project
 from core.validate import authenticate_user, project_exists
+from exceptions import MSGraphException
 from schema.inputs import ProjectMemberFilters
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:  # pragma: no cover
     from schema.group import GraphQLProjectGroup
@@ -70,8 +74,11 @@ async def project_members_query(
 
     if not user_ids:
         return []
-
-    users = await get_users_from_azure(user_ids)
+    try:
+        users = await get_users_from_azure(user_ids)
+    except MSGraphException:
+        logger.exception("User not found in azure Entra ID")
+        users = []
 
     return [
         GraphQLProjectMember(
@@ -93,7 +100,7 @@ def get_user_info(users, user_id: str) -> dict:
     found_users = [_user for _user in users if _user.get("user_id") == user_id]
     if found_users:
         return found_users[0]
-    return {"user_id": "", "name": "", "email": "", "company": "", "last_login": ""}
+    return {"user_id": "", "name": "", "email": "", "company": None, "last_login": None}
 
 
 async def add_project_member_mutation(
