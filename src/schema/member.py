@@ -6,6 +6,7 @@ import strawberry
 from fastapi import HTTPException
 from lcacollect_config.context import get_session
 from lcacollect_config.email import EmailType, send_email
+from lcacollect_config.exceptions import MSGraphException
 from lcacollect_config.graphql.input_filters import filter_model_query
 from lcacollect_config.user import (
     get_aad_user_by_email,
@@ -22,7 +23,6 @@ import models.group as models_group
 import models.member as models_member
 import models.project as models_project
 from core.validate import authenticate_user, project_exists
-from exceptions import MSGraphException
 from schema.inputs import ProjectMemberFilters
 
 logger = logging.getLogger(__name__)
