@@ -3,10 +3,10 @@ from dataclasses import dataclass
 
 import pytest
 from lcacollect_config.connection import create_postgres_engine
+from lcacollect_config.exceptions import MSGraphException
 from pytest_alembic.config import Config
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from exceptions import MSGraphException
 from models.group import ProjectGroup
 from models.member import ProjectMember
 from models.project import Project

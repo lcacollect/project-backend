@@ -1,11 +1,11 @@
 import pytest
 from httpx import AsyncClient
+from lcacollect_config.exceptions import MSGraphException
 from requests import Response
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.config import settings
-from exceptions import MSGraphException
 from models.member import ProjectMember
 
 

@@ -8,6 +8,7 @@ from lcacollect_config.context import get_session, get_token
 from lcacollect_config.exceptions import (
     MicroServiceConnectionError,
     MicroServiceResponseError,
+    MSGraphException,
 )
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
@@ -16,7 +17,6 @@ from strawberry.types import Info
 import models.group as models_group
 import models.member as models_member
 from core.config import settings
-from exceptions import MSGraphException
 
 logger = logging.getLogger(__name__)
 
