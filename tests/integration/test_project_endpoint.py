@@ -355,7 +355,7 @@ async def test_delete_project(client: AsyncClient, projects, db, httpx_mock: HTT
     httpx_mock.add_response(
         url=f"{settings.ROUTER_URL}/graphql",
         json=schema_sources_delete_mock,
-        match_content=b'{"query": "\\n        mutation($id: String!) {\\n            deleteProjectSource(id: $id) {\\n                id\\n            }\\n        }\\n    ", "variables": {"id": "1010101-ce95-49cf-b45d-5b0a867a4a17"}}',
+        match_content=b'{"query": "\\n        mutation($id: String!) {\\n            deleteProjectSource(id: $id)\\n        }\\n    ", "variables": {"id": "1010101-ce95-49cf-b45d-5b0a867a4a17"}}',
     )
 
     httpx_mock.add_response(

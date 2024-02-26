@@ -361,14 +361,12 @@ async def delete_project_source(id: str, token: str):
 
     query = """
         mutation($id: String!) {
-            deleteProjectSource(id: $id) {
-                id
-            }
+            deleteProjectSource(id: $id)
         }
     """
 
     data = await microservice_query(token, query, {"id": id})
-    return data.get("deleteProjectSource", {}).get("id")
+    return data.get("deleteProjectSource", {})
 
 
 async def delete_reporting_schema(id: str, token: str):
