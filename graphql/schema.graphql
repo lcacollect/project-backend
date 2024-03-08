@@ -162,6 +162,7 @@ enum ProjectDomain {
 }
 
 input ProjectFilters {
+  domain: FilterOptions = null
   name: FilterOptions = null
   projectId: FilterOptions = null
   id: FilterOptions = null

@@ -15,6 +15,7 @@ class ProjectMemberFilters(BaseFilter):
 
 @strawberry.input
 class ProjectFilters(BaseFilter):
+    domain: Optional[FilterOptions] = None
     name: Optional[FilterOptions] = None
     project_id: Optional[FilterOptions] = None
     id: Optional[FilterOptions] = None
