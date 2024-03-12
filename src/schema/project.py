@@ -42,12 +42,12 @@ from schema.stage import GraphQLProjectStage
 logger = logging.getLogger(__name__)
 
 
-@strawberry.enum
-class ProjectDomain(Enum):
-    infrastructure = "Infrastructure"
-    energy = "Energy"
-    buildings = "Buildings"
-    tunnels = "Tunnels"
+# @strawberry.enum
+# class ProjectDomain(Enum):
+#     infrastructure = "Infrastructure"
+#     energy = "Energy"
+#     buildings = "Buildings"
+#     tunnels = "Tunnels"
 
 
 @strawberry.federation.type(directives=[Keys(fields="project_id")])
@@ -56,7 +56,7 @@ class GraphQLProject:
     project_id: strawberry.ID | None
     name: str
     client: str | None
-    domain: ProjectDomain | None
+    domain: str | None
     address: str | None
     city: str | None
     country: str | None
@@ -146,7 +146,7 @@ async def add_project_mutation(
     name: str,
     project_id: Optional[str] = None,
     client: Optional[str] = None,
-    domain: Optional[ProjectDomain] = None,
+    domain: Optional[str] = None,
     address: Optional[str] = None,
     city: Optional[str] = None,
     country: Optional[str] = None,
@@ -225,7 +225,7 @@ async def update_project_mutation(
     city: Optional[str] = None,
     country: Optional[str] = None,
     client: Optional[str] = None,
-    domain: Optional[ProjectDomain] = None,
+    domain: Optional[str] = None,
     file: Optional[str] = None,
     public: Optional[bool] = None,
     meta_fields: Optional[JSON] = None,
@@ -245,7 +245,7 @@ async def update_project_mutation(
         "name": name,
         "project_id": project_id,
         "client": client,
-        "domain": domain.name if domain else None,
+        "domain": domain,
         "meta_fields": meta_fields,
         "address": address,
         "city": city,
