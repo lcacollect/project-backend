@@ -38,7 +38,7 @@ type GraphQLProject @keys(fields: "project_id") {
   projectId: ID
   name: String!
   client: String
-  domain: ProjectDomain
+  domain: String
   address: String
   city: String
   country: String
@@ -118,10 +118,10 @@ input LifeCycleStageInput {
 
 type Mutation {
   """Add a Project"""
-  addProject(name: String!, projectId: String = null, client: String = null, domain: ProjectDomain = null, address: String = null, city: String = null, country: String = null, file: String = null, members: [ProjectMemberInput!] = null, groups: [ProjectGroupInput!] = null, stages: [LifeCycleStageInput!] = null, public: Boolean = false, metaFields: JSON = null): GraphQLProject!
+  addProject(name: String!, projectId: String = null, client: String = null, domain: String = null, address: String = null, city: String = null, country: String = null, file: String = null, members: [ProjectMemberInput!] = null, groups: [ProjectGroupInput!] = null, stages: [LifeCycleStageInput!] = null, public: Boolean = false, metaFields: JSON = null): GraphQLProject!
 
   """Update a Project"""
-  updateProject(id: String!, projectId: String = null, name: String = null, address: String = null, city: String = null, country: String = null, client: String = null, domain: ProjectDomain = null, file: String = null, public: Boolean = null, metaFields: JSON = null): GraphQLProject!
+  updateProject(id: String!, projectId: String = null, name: String = null, address: String = null, city: String = null, country: String = null, client: String = null, domain: String = null, file: String = null, public: Boolean = null, metaFields: JSON = null): GraphQLProject!
 
   """Delete a project"""
   deleteProject(id: String!): String!
@@ -152,13 +152,6 @@ type Mutation {
 
   """Remove Project Members from an existing Project Group"""
   removeProjectMembersFromGroup(groupId: String!, memberIds: [String!]!): GraphQLProjectGroup!
-}
-
-enum ProjectDomain {
-  infrastructure
-  energy
-  buildings
-  tunnels
 }
 
 input ProjectFilters {
